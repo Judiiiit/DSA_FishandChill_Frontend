@@ -1,26 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="24dp"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:paddingBottom="16dp" />
 
     <EditText
-        android:id="@+id/etUsername"
-        android:hint="Usuario"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:id="@+id/etUserReg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username" />
 
     <EditText
-        android:id="@+id/etEmail"
+        android:id="@+id/etPassReg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/etEmailReg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
-
-    <EditText
-        android:id="@+id/etPassword"
-        android:hint="Contraseña"
-        android:inputType="textPassword"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:inputType="textEmailAddress" />
 
     <Button
         android:id="@+id/btnRegister"
-        android:text="Registrarse"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#4FA1E6"
+        android:text="Create account" />
+
+    <ProgressBar
+        android:id="@+id/progressRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tvMsgRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:paddingTop="8dp" />
+
 </LinearLayout>

@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@drawable/fondo"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scaleType="centerCrop" >
 
     <TextView
-        android:id="@+id/tvWelcome"
+        android:id="@+id/tvWelcomeTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bienvenido"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="32dp"
+        android:text="Welcome to FishAndChill"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/btnGoLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ir a Login"
-        android:layout_marginBottom="12dp" />
+        android:backgroundTint="#4FA1E6"
+        android:text="LogIn" />
 
     <Button
-        android:id="@+id/btnGoRegisterFromMain"
+        android:id="@+id/btnGoRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ir a Register" />
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#4FA1E6"
+        android:text="Register" />
 
 </LinearLayout>

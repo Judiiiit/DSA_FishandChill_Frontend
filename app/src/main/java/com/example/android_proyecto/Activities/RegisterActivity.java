@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -70,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     User u = response.body();
-                    tvMsg.setText("Account created successfully");
+                    Toast.makeText(RegisterActivity.this, "Registro completado", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(RegisterActivity.this, LogInActivity.class));
                     finish();
                 }

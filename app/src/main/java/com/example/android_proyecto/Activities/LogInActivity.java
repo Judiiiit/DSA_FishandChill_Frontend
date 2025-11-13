@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -76,7 +77,7 @@ public class LogInActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     Token token = response.body();
-                    tvMsg.setText("Login successful");
+                    Toast.makeText(LogInActivity.this, "Login correcto", Toast.LENGTH_LONG).show();
 
                     startActivity(new Intent(LogInActivity.this, MainActivity.class));
                     finish();

@@ -1,5 +1,6 @@
 package com.example.android_proyecto.Models;
 
+//Register
 public class UserRegister {
     private String username;
     private String password;

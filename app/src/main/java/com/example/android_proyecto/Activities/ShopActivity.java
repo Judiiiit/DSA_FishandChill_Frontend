@@ -74,7 +74,7 @@ public class ShopActivity extends AppCompatActivity {
         String token = session.getToken();
 
         if (token == null || token.isEmpty()) {
-            tvCoins.setText("Coins: (sin token)");
+            tvCoins.setText("Coins: (no tokens available)");
             Toast.makeText(this,
                     "No hay token guardado. Haz login otra vez.",
                     Toast.LENGTH_LONG).show();

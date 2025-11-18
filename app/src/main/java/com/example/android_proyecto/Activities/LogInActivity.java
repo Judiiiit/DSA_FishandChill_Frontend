@@ -88,8 +88,8 @@ public class LogInActivity extends AppCompatActivity {
                     Token token = response.body();
                     session.saveToken(token.getToken()); // Guardamos el token en SessionManager
                     Toast.makeText(LogInActivity.this,
-                            "Login correcto", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(LogInActivity.this, ShopActivity.class);
+                            "Login successful", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(LogInActivity.this, MenuActivity.class);
                     startActivity(intent);
                     finish();
                 }

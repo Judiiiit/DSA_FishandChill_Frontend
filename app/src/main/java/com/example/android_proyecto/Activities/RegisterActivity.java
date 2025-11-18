@@ -25,7 +25,6 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
 
     private ApiService api;
-
     private EditText etUser, etPass, etEmail;
     private ProgressBar progress;
     private TextView tvMsg;
@@ -79,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     User u = response.body();
-                    Toast.makeText(RegisterActivity.this, "Registro completado", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, "Register completed", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(RegisterActivity.this, LogInActivity.class));
                     finish();
                 }

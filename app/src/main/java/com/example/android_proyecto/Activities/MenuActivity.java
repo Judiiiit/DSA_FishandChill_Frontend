@@ -21,14 +21,12 @@ public class MenuActivity extends AppCompatActivity {
         btnGoGame = findViewById(R.id.btnGoGame);
         btnGoShop = findViewById(R.id.btnGoShop);
 
-        // Botón juego: solo mensaje "en producción"
         btnGoGame.setOnClickListener(v ->
                 Toast.makeText(MenuActivity.this,
                         "Feature in production",
                         Toast.LENGTH_SHORT).show()
         );
 
-        // Botón shop: abrir ShopActivity
         btnGoShop.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, ShopActivity.class);
             startActivity(intent);

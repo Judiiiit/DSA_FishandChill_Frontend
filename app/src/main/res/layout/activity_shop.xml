@@ -7,16 +7,31 @@
     android:layout_height="match_parent"
     android:background="#E3F2FD">
 
-
-    <TextView
-        android:id="@+id/tvShopTitle"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tienda"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#0D47A1"
-    android:layout_marginBottom="8dp" />
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvShopTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tienda"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#0D47A1"
+            android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:backgroundTint="#4FA1E6"
+            android:padding="6dp"
+            android:layout_gravity="end|center_vertical" />
+
+    </FrameLayout>
 
 
     <TextView
@@ -27,7 +42,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#2196F3"
-    android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="12dp" />
 
 
     <LinearLayout
@@ -37,26 +52,27 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:background="#FFFFFFFF"
-    android:elevation="4dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp">
+        android:elevation="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRods"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="4dp" />
-</LinearLayout>
-
-
-<ProgressBar
-android:id="@+id/progressShop"
-style="?android:attr/progressBarStyleLarge"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_marginTop="12dp"
-android:layout_gravity="center"
-android:visibility="gone"
-android:indeterminateTint="#2196F3" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRods"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="4dp" />
 
     </LinearLayout>
+
+
+    <ProgressBar
+        android:id="@+id/progressShop"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:indeterminateTint="#2196F3" />
+
+</LinearLayout>

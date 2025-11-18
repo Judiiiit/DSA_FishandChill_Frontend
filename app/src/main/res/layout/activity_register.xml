@@ -56,4 +56,14 @@
         android:textColor="@android:color/holo_red_dark"
         android:paddingTop="8dp" />
 
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:backgroundTint="#4FA1E6"
+        android:layout_gravity="end"
+        android:padding="6dp"
+        android:layout_marginBottom="12dp"/>
+
 </LinearLayout>

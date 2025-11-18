@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.UserLogIn;
 import com.example.android_proyecto.R;
+import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
@@ -30,7 +31,7 @@ public class LogInActivity extends AppCompatActivity {
     private EditText etUser, etPass;
     private ProgressBar progress;
     private TextView tvMsg;
-    private Button btnLogin, btnCreateAccount;
+    private Button btnLogin, btnCreateAccount, btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class LogInActivity extends AppCompatActivity {
         btnCreateAccount = findViewById(R.id.btnCreateAccount);
         progress = findViewById(R.id.progressLogin);
         tvMsg = findViewById(R.id.tvMsgLogin);
+        btnBack = findViewById(R.id.btnBack);
 
         api = RetrofitClient.getApiService();
         session = new SessionManager(this);
@@ -51,6 +53,13 @@ public class LogInActivity extends AppCompatActivity {
 
         btnCreateAccount.setOnClickListener(v ->
                 startActivity(new Intent(LogInActivity.this, RegisterActivity.class)));
+
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
     }
 
     private void showLoading(boolean show) {
@@ -76,21 +85,12 @@ public class LogInActivity extends AppCompatActivity {
                 showLoading(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    // 1. Obtenemos el token
                     Token token = response.body();
-
-                    // 2. Guardamos el token en SessionManager
-                    session.saveToken(token.getToken());
-
-                    // 3. Avisamos al usuario
+                    session.saveToken(token.getToken()); // Guardamos el token en SessionManager
                     Toast.makeText(LogInActivity.this,
                             "Login correcto", Toast.LENGTH_LONG).show();
-
-                    // 4. Abrimos la ShopActivity
                     Intent intent = new Intent(LogInActivity.this, ShopActivity.class);
                     startActivity(intent);
-
-                    // 5. Cerramos la pantalla de login
                     finish();
                 }
                 else if (response.code() == 401) {

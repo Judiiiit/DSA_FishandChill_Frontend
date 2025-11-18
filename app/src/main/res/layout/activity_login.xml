@@ -57,4 +57,14 @@
         android:text="Don't have an account yet? Create an account"
         android:layout_marginTop="16dp" />
 
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:backgroundTint="#4FA1E6"
+        android:layout_gravity="end"
+        android:padding="6dp"
+        android:layout_marginBottom="12dp"/>
+
 </LinearLayout>

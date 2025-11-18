@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserRegister;
 import com.example.android_proyecto.R;
+import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
 
@@ -28,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etUser, etPass, etEmail;
     private ProgressBar progress;
     private TextView tvMsg;
-    private Button btnRegister;
+    private Button btnRegister, btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,15 @@ public class RegisterActivity extends AppCompatActivity {
         progress = findViewById(R.id.progressRegister);
         tvMsg = findViewById(R.id.tvMsgRegister);
         api = RetrofitClient.getApiService();
+        btnBack = findViewById(R.id.btnBack);
 
         btnRegister.setOnClickListener(v -> doRegister());
+
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void showLoading(boolean show) {

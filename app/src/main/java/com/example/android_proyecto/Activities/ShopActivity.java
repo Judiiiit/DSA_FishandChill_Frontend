@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.Models.User;
 
 import com.example.android_proyecto.Adapters.RodsAdapter;
@@ -37,6 +40,8 @@ public class ShopActivity extends AppCompatActivity {
     private RodsAdapter adapter;
     private ApiService api;
     private SessionManager session;
+    private Button btnBack;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class ShopActivity extends AppCompatActivity {
         tvCoins  = findViewById(R.id.tvCoins);
         rvRods   = findViewById(R.id.rvRods);
         progress = findViewById(R.id.progressShop);
+        btnBack = findViewById(R.id.btnBack);
 
         api = RetrofitClient.getApiService();
         session = new SessionManager(this);
@@ -56,6 +62,12 @@ public class ShopActivity extends AppCompatActivity {
 
         loadBalance();
         loadRods();
+
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(ShopActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void loadBalance() {

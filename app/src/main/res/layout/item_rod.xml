@@ -1,33 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:layout_margin="8dp"
+    android:background="#FFFFFFFF"
+    android:elevation="4dp"
+    android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tvRodName"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Rod name"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvRodDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Description" />
+        <TextView
+            android:id="@+id/tvRodName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Caña básica"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#0D47A1" />
+
+        <TextView
+            android:id="@+id/tvRodDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Descripción de la caña"
+            android:textSize="14sp"
+            android:textColor="#555555" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvRodPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Price: 0" />
+        android:text="100"
+        android:textSize="14sp"
+        android:textColor="#2196F3"
+        android:layout_marginEnd="8dp" />
 
-    <Button
-        android:id="@+id/btnBuyRod"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Comprar" />
+    <ImageButton
+        android:id="@+id/btnBuy"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_add"
+        app:tint="#2196F3"
+        android:contentDescription="Comprar" />
 </LinearLayout>

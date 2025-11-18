@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -67,14 +68,14 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
 
     static class RodViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDesc, tvPrice;
-        Button btnBuy;
+        ImageButton btnBuy;
 
         RodViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvRodName);
             tvDesc = itemView.findViewById(R.id.tvRodDesc);
             tvPrice = itemView.findViewById(R.id.tvRodPrice);
-            btnBuy = itemView.findViewById(R.id.btnBuyRod);
+            btnBuy = itemView.findViewById(R.id.btnBuy);
         }
     }
 }

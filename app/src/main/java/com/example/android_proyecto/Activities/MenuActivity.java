@@ -23,7 +23,7 @@ public class MenuActivity extends AppCompatActivity {
 
         btnGoGame.setOnClickListener(v ->
                 Toast.makeText(MenuActivity.this,
-                        "Feature in production",
+                        "Feature in production!!",
                         Toast.LENGTH_SHORT).show()
         );
 

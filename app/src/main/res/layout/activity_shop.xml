@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="center_horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#E3F2FD">
+    android:background="@drawable/fondo1">
+
+    <ImageView
+        android:id="@+id/ivLogoShop"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:src="@drawable/splash_logo"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerCrop" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="12dp">
+        android:paddingBottom="8dp">
 
         <TextView
             android:id="@+id/tvShopTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tienda"
-            android:textSize="24sp"
+            android:text="Shop"
+            android:textSize="26sp"
             android:textStyle="bold"
             android:textColor="#0D47A1"
             android:layout_gravity="center" />
@@ -28,42 +37,39 @@
             android:layout_height="wrap_content"
             android:text="Back"
             android:backgroundTint="#4FA1E6"
-            android:padding="6dp"
+            android:paddingHorizontal="20dp"
+            android:textAllCaps="false"
             android:layout_gravity="end|center_vertical" />
-
     </FrameLayout>
-
 
     <TextView
         android:id="@+id/tvCoins"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Coins: 0"
-        android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#2196F3"
+        android:textSize="18sp"
+        android:textColor="#1E88E5"
         android:layout_marginBottom="12dp" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="8dp"
-        android:background="#FFFFFFFF"
-        android:elevation="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp">
+        android:padding="10dp"
+        android:background="@drawable/bg_login_card"
+        android:elevation="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRods"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="4dp" />
+            android:padding="6dp" />
 
     </LinearLayout>
-
 
     <ProgressBar
         android:id="@+id/progressShop"
@@ -71,7 +77,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:layout_gravity="center"
         android:visibility="gone"
         android:indeterminateTint="#2196F3" />
 

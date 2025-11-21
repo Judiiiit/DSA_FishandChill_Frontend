@@ -25,7 +25,7 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
 
     private ApiService api;
-    private EditText etUser, etPass, etEmail;
+    private EditText etUser, etPass, etPassConfirm, etEmail;
     private ProgressBar progress;
     private TextView tvMsg;
     private Button btnRegister, btnBack;
@@ -37,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         etUser = findViewById(R.id.etUserReg);
         etPass = findViewById(R.id.etPassReg);
+        etPassConfirm = findViewById(R.id.etPassConfirmReg);
         etEmail = findViewById(R.id.etEmailReg);
         btnRegister = findViewById(R.id.btnRegister);
         progress = findViewById(R.id.progressRegister);
@@ -60,10 +61,16 @@ public class RegisterActivity extends AppCompatActivity {
     private void doRegister() {
         String username = etUser.getText().toString().trim();
         String password = etPass.getText().toString().trim();
+        String password2 = etPassConfirm.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
 
-        if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || password2.isEmpty() || email.isEmpty()) {
             tvMsg.setText("Please fill in all fields");
+            return;
+        }
+
+        if (!password.equals(password2)) {
+            tvMsg.setText("Passwords do not match");
             return;
         }
 
@@ -81,11 +88,9 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Register completed", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(RegisterActivity.this, LogInActivity.class));
                     finish();
-                }
-                else if (response.code() == 409) {
+                } else if (response.code() == 409) {
                     tvMsg.setText("Username already exists");
-                }
-                else {
+                } else {
                     tvMsg.setText("Registration error: " + response.code());
                 }
             }
@@ -97,5 +102,4 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-
 }

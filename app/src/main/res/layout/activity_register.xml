@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Username"
                 android:padding="10dp"
-                android:background="@android:drawable/edit_text"
+                android:background="@drawable/edittext_rounded"
                 android:inputType="textPersonName" />
 
             <EditText
@@ -55,7 +55,7 @@
                 android:layout_marginTop="12dp"
                 android:hint="Email"
                 android:padding="10dp"
-                android:background="@android:drawable/edit_text"
+                android:background="@drawable/edittext_rounded"
                 android:inputType="textEmailAddress" />
 
             <EditText
@@ -65,7 +65,7 @@
                 android:layout_marginTop="12dp"
                 android:hint="Password"
                 android:padding="10dp"
-                android:background="@android:drawable/edit_text"
+                android:background="@drawable/edittext_rounded"
                 android:inputType="textPassword" />
 
             <EditText
@@ -75,7 +75,7 @@
                 android:layout_marginTop="12dp"
                 android:hint="Repeat password"
                 android:padding="10dp"
-                android:background="@android:drawable/edit_text"
+                android:background="@drawable/edittext_rounded"
                 android:inputType="textPassword" />
 
             <Button

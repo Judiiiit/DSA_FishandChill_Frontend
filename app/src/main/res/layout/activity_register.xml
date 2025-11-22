@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fondologin">
 
@@ -8,25 +8,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="12dp"    android:paddingBottom="12dp" android:paddingStart="40dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="40dp"
         android:paddingEnd="40dp"
         android:gravity="center">
 
         <ImageView
             android:id="@+id/ivLogoRegister"
-            android:layout_width="151dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="10dp"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:contentDescription="@string/app_name"
             android:scaleType="fitCenter"
             android:src="@drawable/mainlogo" />
 
         <FrameLayout
-            android:layout_width="335dp"
-            android:layout_height="312dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="5dp"
+            android:layout_width="286dp"
+            android:layout_height="282dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/bg_login_card">
 
             <LinearLayout
@@ -34,14 +36,14 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:fontFamily="@font/pixel_font"
-                    android:paddingBottom="12dp"
+                    android:paddingBottom="8dp"
                     android:text="Register"
                     android:textColor="#333333"
                     android:textSize="18sp"
@@ -50,60 +52,61 @@
                 <EditText
                     android:id="@+id/etUserReg"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="32dp"
                     android:background="@drawable/edittext_rounded"
                     android:fontFamily="@font/pixel_font"
                     android:hint="Username"
                     android:inputType="textPersonName"
-                    android:padding="7dp"
+                    android:padding="6dp"
                     android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/etEmailReg"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="5dp"
                     android:background="@drawable/edittext_rounded"
                     android:fontFamily="@font/pixel_font"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
-                    android:padding="7dp"
+                    android:padding="6dp"
                     android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/etPassReg"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="5dp"
                     android:background="@drawable/edittext_rounded"
                     android:fontFamily="@font/pixel_font"
                     android:hint="Password"
                     android:inputType="textPassword"
-                    android:padding="7dp"
+                    android:padding="6dp"
                     android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/etPassConfirmReg"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="5dp"
                     android:background="@drawable/edittext_rounded"
                     android:fontFamily="@font/pixel_font"
                     android:hint="Repeat password"
                     android:inputType="textPassword"
-                    android:padding="7dp"
+                    android:padding="6dp"
                     android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/btnRegister"
                     android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="#4FA1E6"
+                    android:layout_height="34dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/pixel_button_bg"
                     android:fontFamily="@font/pixel_font"
                     android:text="Create account"
                     android:textAllCaps="false"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    app:backgroundTint="@null" />
 
                 <ProgressBar
                     android:id="@+id/progressRegister"
@@ -111,7 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="3dp"
                     android:visibility="gone" />
 
                 <TextView
@@ -119,7 +122,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/pixel_font"
-                    android:paddingTop="4dp"
+                    android:paddingTop="3dp"
                     android:textColor="@android:color/holo_red_light"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -129,13 +132,12 @@
         <Button
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
-            android:layout_height="37dp"
-            android:backgroundTint="#4FA1E6"
-            android:fontFamily="@font/pixel_font"
-            android:paddingLeft="14dp"
-            android:paddingRight="14dp"
+            android:layout_height="32dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
             android:text="Back"
             android:textAllCaps="false"
+            android:background="@drawable/pixel_button_bg"  app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
             android:textSize="14sp" />
 
     </LinearLayout>

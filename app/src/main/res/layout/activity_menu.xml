@@ -1,25 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
-    android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo1">
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/mainimg2"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp">
 
-    <Button
-        android:id="@+id/btnGoGame"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/ivGameLogo"
+        android:layout_width="175dp"
+        android:layout_height="81dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitCenter"
+        android:src="@drawable/mainlogo" />
+
+    <FrameLayout
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
-        android:text="Enter game"
-        android:backgroundTint="#4FA1E6"
-        android:layout_marginBottom="16dp" />
+        android:background="@drawable/bg_login_card"
+        android:padding="12dp">
 
-    <Button
-        android:id="@+id/btnGoShop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Go to shop"
-        android:backgroundTint="#4FA1E6" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/tvWelcomeUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/pixel_font"
+                android:text="Welcome, Player!"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnGoGame"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/pixel_button_bg"
+                app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+                android:text="Enter Game"
+                android:textAllCaps="false"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnGoShop"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/pixel_button_bg"
+                app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+                android:text="Go to Shop"
+                android:textAllCaps="false"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/pixel_button_bg"
+                app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+                android:text="Log Out"
+                android:textSize="14sp"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

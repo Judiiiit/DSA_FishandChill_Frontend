@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"  android:orientation="vertical"
     android:gravity="center"
-    android:padding="32dp"
-    android:background="@drawable/backimg"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:background="@drawable/mainimg"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <TextView
         android:id="@+id/tvWelcomeTitle"
-        android:layout_width="308dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="24dp"
         android:fontFamily="@font/pixel_font"
         android:text="Welcome to Fish&amp;Chill"
         android:textColor="#FFFFFF"
-        android:textSize="30dp"
+        android:textSize="28sp"
         android:textStyle="bold" />
 
     <Button
         android:id="@+id/btnGoLogin"
-        android:layout_width="495dp"
-        android:layout_height="52dp"
-        android:backgroundTint="#3F78B4"
-        android:fontFamily="@font/pixel_font"
-        android:text="Log In" />
+        android:layout_width="250dp"
+        android:layout_height="48dp"
+        android:background="@drawable/pixel_button_bg"  app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+        android:text="Log In"
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/btnGoRegister"
-        android:layout_width="495dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#3F78B4"
-        android:fontFamily="@font/pixel_font"
-        android:text="Register" />
+        android:layout_width="250dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/pixel_button_bg"  app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+        android:text="Register"
+        android:textSize="16sp" />
 
 </LinearLayout>

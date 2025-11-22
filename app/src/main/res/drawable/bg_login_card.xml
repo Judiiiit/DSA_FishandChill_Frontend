@@ -1,10 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#AAFFFFFF" />
-    <corners android:radius="24dp" />
-    <padding
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fondo marrón con esquinas redondeadas -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <solid android:color="#7A4C30" />
+        </shape>
+    </item>
+
+    <!-- Imagen de madera ocupando todo -->
+    <item>
+        <bitmap
+            android:src="@drawable/pixel_wood_bg"
+            android:gravity="fill" />
+    </item>
+
+    <!-- Borde -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <stroke
+                android:width="2dp"
+                android:color="#966D44" />
+        </shape>
+    </item>
+
+    <!-- Padding interno del card -->
+    <item
+        android:bottom="4dp"
         android:left="4dp"
-        android:top="4dp"
         android:right="4dp"
-        android:bottom="4dp" />
-</shape>
+        android:top="4dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <padding
+                android:left="16dp"
+                android:top="16dp"
+                android:right="16dp"
+                android:bottom="16dp" />
+        </shape>
+    </item>
+
+</layer-list>

@@ -2,34 +2,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp"
-    android:background="@drawable/fondo"
+    android:padding="32dp"
+    android:background="@drawable/backimg"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <TextView
         android:id="@+id/tvWelcomeTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="308dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="Welcome to FishAndChill"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
+        android:layout_marginBottom="48dp"
+        android:fontFamily="@font/pixel_font"
+        android:text="Welcome to Fish&amp;Chill"
+        android:textColor="#FFFFFF"
+        android:textSize="30dp"
         android:textStyle="bold" />
 
     <Button
         android:id="@+id/btnGoLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#4FA1E6"
-        android:text="LogIn" />
+        android:layout_width="495dp"
+        android:layout_height="52dp"
+        android:backgroundTint="#3F78B4"
+        android:fontFamily="@font/pixel_font"
+        android:text="Log In" />
 
     <Button
         android:id="@+id/btnGoRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="495dp"
+        android:layout_height="52dp"
         android:layout_marginTop="16dp"
-        android:backgroundTint="#4FA1E6"
+        android:backgroundTint="#3F78B4"
+        android:fontFamily="@font/pixel_font"
         android:text="Register" />
 
 </LinearLayout>

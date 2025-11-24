@@ -76,7 +76,7 @@ public class ShopActivity extends AppCompatActivity {
         if (token == null || token.isEmpty()) {
             tvCoins.setText("Coins: (no tokens available)");
             Toast.makeText(this,
-                    "No hay token guardado. Haz login otra vez.",
+                    "No token saved. Please log in again.",
                     Toast.LENGTH_LONG).show();
             return;
         }
@@ -90,7 +90,7 @@ public class ShopActivity extends AppCompatActivity {
                 } else {
                     tvCoins.setText("Coins: ?");
                     Toast.makeText(ShopActivity.this,
-                            "Error balance. Código HTTP: " + response.code(),
+                            "Balance error. HTTP code: " + response.code(),
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -99,7 +99,7 @@ public class ShopActivity extends AppCompatActivity {
             public void onFailure(Call<User> call, Throwable t) {
                 tvCoins.setText("Coins: ?");
                 Toast.makeText(ShopActivity.this,
-                        "Error de conexión al obtener balance: " + t.getMessage(),
+                        "Connection error while retrieving balance: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -122,7 +122,7 @@ public class ShopActivity extends AppCompatActivity {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progress.setVisibility(View.GONE);
                 Toast.makeText(ShopActivity.this,
-                        "Error al cargar catálogo de cañas: " + t.getMessage(),
+                        "Error loading rod catalog: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -140,12 +140,12 @@ public class ShopActivity extends AppCompatActivity {
 
                     if (rods.isEmpty()) {
                         Toast.makeText(ShopActivity.this,
-                                "La API ha devuelto 0 cañas (lista vacía).",
+                                "API returned 0 rods (empty list).",
                                 Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(ShopActivity.this,
-                            "Error al cargar cañas. Código HTTP: " + response.code(),
+                            "Error loading rods. HTTP code: " + response.code(),
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -154,7 +154,7 @@ public class ShopActivity extends AppCompatActivity {
             public void onFailure(Call<List<FishingRod>> call, Throwable t) {
                 progress.setVisibility(View.GONE);
                 Toast.makeText(ShopActivity.this,
-                        "Error de conexión al cargar cañas: " + t.getMessage(),
+                        "Connection error while loading rods: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -165,7 +165,7 @@ public class ShopActivity extends AppCompatActivity {
 
         if (token == null || token.isEmpty()) {
             Toast.makeText(this,
-                    "No hay token guardado. No se puede comprar.",
+                    "No token saved. Purchase not possible.",
                     Toast.LENGTH_LONG).show();
             return;
         }
@@ -179,25 +179,25 @@ public class ShopActivity extends AppCompatActivity {
 
                 if (response.isSuccessful()) {
                     Toast.makeText(ShopActivity.this,
-                            "Has comprado " + rod.getName(),
+                            "You have purchased " + rod.getName(),
                             Toast.LENGTH_SHORT).show();
                     loadBalance();   // actualiza las coins
                     return;
                 }
 
                 // Aquí distinguimos los distintos tipos de error
-                String mensaje = "Error al comprar. Código HTTP: " + response.code();
+                String mensaje = "Purchase error. HTTP code: " + response.code();
 
                 try {
                     ResponseBody errorBody = response.errorBody();
                     String errorText = errorBody != null ? errorBody.string() : "";
 
                     if (errorText.contains("Not enough coins")) {
-                        mensaje = "No tienes suficientes coins para comprar este ítem.";
+                        mensaje = "You do not have enough coins to buy this item.";
                     } else if (errorText.contains("Already owned")) {
-                        mensaje = "Item ya comprado.";
+                        mensaje = "Item already purchased.";
                     } else if (errorText.contains("Rod not found")) {
-                        mensaje = "Item ya no disponible en la tienda.";
+                        mensaje = "Item no longer available in the shop.";
                     }
                 } catch (Exception e) {
                     // Si falla al leer el body, dejamos el mensaje genérico
@@ -210,7 +210,7 @@ public class ShopActivity extends AppCompatActivity {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progress.setVisibility(View.GONE);
                 Toast.makeText(ShopActivity.this,
-                        "Error de conexión al comprar: " + t.getMessage(),
+                        "Connection error while purchasing: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         });

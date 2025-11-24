@@ -69,6 +69,16 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        if (!email.contains("@")) {
+            tvMsg.setText("Invalid email format");
+            return;
+        }
+
+        if (password.length() < 6) {
+            tvMsg.setText("Password must be at least 6 characters");
+            return;
+        }
+
         if (!password.equals(password2)) {
             tvMsg.setText("Passwords do not match");
             return;

@@ -64,7 +64,7 @@ public class ShopActivity extends AppCompatActivity {
         loadRods();
 
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, MainActivity.class);
+            Intent intent = new Intent(ShopActivity.this, MenuActivity.class);
             startActivity(intent);
             finish();
         });

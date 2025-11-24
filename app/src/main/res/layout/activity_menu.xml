@@ -49,7 +49,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/pixel_button_bg"
-                app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+                app:backgroundTint="@null"
+                android:fontFamily="@font/pixel_font"
                 android:text="Enter Game"
                 android:textAllCaps="false"
                 android:textSize="16sp" />
@@ -60,7 +61,8 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/pixel_button_bg"
-                app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+                app:backgroundTint="@null"
+                android:fontFamily="@font/pixel_font"
                 android:text="Go to Shop"
                 android:textAllCaps="false"
                 android:textSize="16sp" />
@@ -68,10 +70,11 @@
             <Button
                 android:id="@+id/btnLogout"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/pixel_button_bg"
-                app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
+                app:backgroundTint="@null"
+                android:fontFamily="@font/pixel_font"
                 android:text="Log Out"
                 android:textSize="14sp"
                 android:textAllCaps="false" />

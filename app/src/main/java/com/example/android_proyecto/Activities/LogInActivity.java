@@ -47,7 +47,14 @@ public class LogInActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
         api = RetrofitClient.getApiService();
+
         session = new SessionManager(this);
+        String existingToken = session.getToken();
+        if (existingToken != null) {
+            startActivity(new Intent(LogInActivity.this, MenuActivity.class));
+            finish();
+            return;
+        }
 
         btnLogin.setOnClickListener(v -> doLogin());
 

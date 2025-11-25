@@ -18,33 +18,56 @@ import retrofit2.http.Path;
 
 public interface ApiService {
 
-    //Registro
+    // --- AUTH ---
+
+    // Registro
     @POST("auth/register")
     Call<User> register(@Body UserRegister body);
 
-    //Login
+    // Login
     @POST("auth/login")
     Call<Token> login(@Body UserLogIn body);
 
-    // Catálogo de cañas
-    @GET("catalog/rods")
-    Call<List<FishingRod>> getRods();
 
-    // balance del usuario
-    @GET("me/balance")
-    Call<ResponseBody> getBalance(@Header("Authorization") String token);
+    // --- ME ---
 
-    @GET("catalog/rods/loadAll")
-    Call<ResponseBody> loadRodsDictionary();
-
-    //Perfil
     @GET("me")
     Call<User> getProfile(@Header("Authorization") String token);
 
-    // comprar caña
-    @POST("shop/rods/{rodId}/buy")
+    @GET("me/captured_fishes")
+    Call<ResponseBody> getMyCapturedFishes(@Header("Authorization") String token);
+    // Nota: Deberías crear un modelo List<CapturedFish> y reemplazar ResponseBody
+
+    @GET("me/owned_fishing_rods")
+    Call<List<FishingRod>> getMyOwnedFishingRods(@Header("Authorization") String token);
+
+
+    // --- CATALOG ---
+
+    @GET("catalog/fishing_rods")
+    Call<List<FishingRod>> getRods();
+
+    @GET("catalog/fishing_rods/{fishing_rod_name}")
+    Call<FishingRod> getRodByName(@Path("fishing_rod_name") String rodName);
+
+    @GET("catalog/fishes")
+    Call<ResponseBody> getFishes();
+
+    @GET("catalog/fishes/{species_name}")
+    Call<ResponseBody> getFishByName(@Path("species_name") String speciesName);
+
+
+    // --- SHOP ---
+
+    @POST("shop/fishing_rods/{fishing_rod_name}/buy")
     Call<ResponseBody> buyRod(
             @Header("Authorization") String token,
-            @Path("rodId") String rodId
+            @Path("fishing_rod_name") String rodName
     );
+
+
+    // --- GAME ---
+
+    @POST("game/captured")
+    Call<ResponseBody> captureFish(@Header("Authorization") String token);
 }

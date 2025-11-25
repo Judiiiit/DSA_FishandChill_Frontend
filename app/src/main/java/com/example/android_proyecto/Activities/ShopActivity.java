@@ -13,11 +13,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android_proyecto.MainActivity;
-import com.example.android_proyecto.Models.User;
-
 import com.example.android_proyecto.Adapters.RodsAdapter;
 import com.example.android_proyecto.Models.FishingRod;
+import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
@@ -36,12 +34,11 @@ public class ShopActivity extends AppCompatActivity {
     private TextView tvCoins;
     private RecyclerView rvRods;
     private ProgressBar progress;
+    private Button btnBack;
 
     private RodsAdapter adapter;
     private ApiService api;
     private SessionManager session;
-    private Button btnBack;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +48,7 @@ public class ShopActivity extends AppCompatActivity {
         tvCoins  = findViewById(R.id.tvCoins);
         rvRods   = findViewById(R.id.rvRods);
         progress = findViewById(R.id.progressShop);
-        btnBack = findViewById(R.id.btnBack);
+        btnBack  = findViewById(R.id.btnBack);
 
         api = RetrofitClient.getApiService();
         session = new SessionManager(this);
@@ -74,10 +71,7 @@ public class ShopActivity extends AppCompatActivity {
         String token = session.getToken();
 
         if (token == null || token.isEmpty()) {
-            tvCoins.setText("Coins: (no tokens available)");
-            Toast.makeText(this,
-                    "No token saved. Please log in again.",
-                    Toast.LENGTH_LONG).show();
+            tvCoins.setText("Coins: --");
             return;
         }
 
@@ -89,46 +83,20 @@ public class ShopActivity extends AppCompatActivity {
                     tvCoins.setText("Coins: " + coins);
                 } else {
                     tvCoins.setText("Coins: ?");
-                    Toast.makeText(ShopActivity.this,
-                            "Balance error. HTTP code: " + response.code(),
-                            Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                tvCoins.setText("Coins: ?");
-                Toast.makeText(ShopActivity.this,
-                        "Connection error while retrieving balance: " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
+                tvCoins.setText("Coins: Error");
+                Toast.makeText(ShopActivity.this, "Error loading balance", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 
     private void loadRods() {
         progress.setVisibility(View.VISIBLE);
 
-        // 1) primero pedimos al backend que cargue el diccionario de cañas
-        api.loadRodsDictionary().enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                // Nos da igual el texto, lo importante es que lo intente.
-                // Aunque devuelva 409 porque ya estaba cargado, seguimos.
-                fetchRods();   // 2) ahora sí, pedimos la lista de cañas
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                progress.setVisibility(View.GONE);
-                Toast.makeText(ShopActivity.this,
-                        "Error loading rod catalog: " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void fetchRods() {
         api.getRods().enqueue(new Callback<List<FishingRod>>() {
             @Override
             public void onResponse(Call<List<FishingRod>> call, Response<List<FishingRod>> response) {
@@ -136,26 +104,20 @@ public class ShopActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<FishingRod> rods = response.body();
-                    adapter.setRods(rods);  // ya llama a notifyDataSetChanged()
+                    adapter.setRods(rods);
 
                     if (rods.isEmpty()) {
-                        Toast.makeText(ShopActivity.this,
-                                "API returned 0 rods (empty list).",
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(ShopActivity.this, "The shop is empty.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(ShopActivity.this,
-                            "Error loading rods. HTTP code: " + response.code(),
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(ShopActivity.this, "Error loading shop. Code: " + response.code(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<FishingRod>> call, Throwable t) {
                 progress.setVisibility(View.GONE);
-                Toast.makeText(ShopActivity.this,
-                        "Connection error while loading rods: " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(ShopActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -164,43 +126,38 @@ public class ShopActivity extends AppCompatActivity {
         String token = session.getToken();
 
         if (token == null || token.isEmpty()) {
-            Toast.makeText(this,
-                    "No token saved. Purchase not possible.",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No active session. Please log in.", Toast.LENGTH_LONG).show();
             return;
         }
 
         progress.setVisibility(View.VISIBLE);
 
-        api.buyRod(token, rod.getId()).enqueue(new Callback<ResponseBody>() {
+        api.buyRod(token, rod.getName()).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 progress.setVisibility(View.GONE);
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(ShopActivity.this,
-                            "You have purchased " + rod.getName(),
-                            Toast.LENGTH_SHORT).show();
-                    loadBalance();   // actualiza las coins
+                    Toast.makeText(ShopActivity.this, "You purchased: " + rod.getName() + "!", Toast.LENGTH_SHORT).show();
+                    loadBalance();
                     return;
                 }
 
-                // Aquí distinguimos los distintos tipos de error
-                String mensaje = "Purchase error. HTTP code: " + response.code();
+                String mensaje = "Purchase error. Code: " + response.code();
 
                 try {
                     ResponseBody errorBody = response.errorBody();
                     String errorText = errorBody != null ? errorBody.string() : "";
 
-                    if (errorText.contains("Not enough coins")) {
-                        mensaje = "You do not have enough coins to buy this item.";
-                    } else if (errorText.contains("Already owned")) {
-                        mensaje = "Item already purchased.";
-                    } else if (errorText.contains("Rod not found")) {
-                        mensaje = "Item no longer available in the shop.";
+                    if (errorText.contains("coins")) {
+                        mensaje = "Not enough coins.";
+                    } else if (errorText.contains("owned")) {
+                        mensaje = "You already own this rod.";
+                    } else if (errorText.contains("found")) {
+                        mensaje = "Item no longer available.";
                     }
                 } catch (Exception e) {
-                    // Si falla al leer el body, dejamos el mensaje genérico
+                    e.printStackTrace();
                 }
 
                 Toast.makeText(ShopActivity.this, mensaje, Toast.LENGTH_LONG).show();
@@ -209,12 +166,8 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progress.setVisibility(View.GONE);
-                Toast.makeText(ShopActivity.this,
-                        "Connection error while purchasing: " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(ShopActivity.this, "Connection error while buying: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
-
-
 }

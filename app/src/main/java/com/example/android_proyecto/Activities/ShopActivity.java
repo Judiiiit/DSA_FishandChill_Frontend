@@ -36,6 +36,10 @@ public class ShopActivity extends AppCompatActivity {
     private ProgressBar progress;
     private Button btnBack;
 
+    // 🔹 NUEVOS CAMPOS QUE USAMOS DEL LAYOUT
+    private Button btnRods;
+    private TextView tvInitialMessage;
+
     private RodsAdapter adapter;
     private ApiService api;
     private SessionManager session;
@@ -45,27 +49,45 @@ public class ShopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
 
-        tvCoins  = findViewById(R.id.tvCoins);
-        rvRods   = findViewById(R.id.rvRods);
-        progress = findViewById(R.id.progressShop);
-        btnBack  = findViewById(R.id.btnBack);
+        // VISTAS
+        tvCoins          = findViewById(R.id.tvCoins);
+        rvRods           = findViewById(R.id.rvRods);
+        progress         = findViewById(R.id.progressShop);
+        btnBack          = findViewById(R.id.btnBack);
+        btnRods          = findViewById(R.id.btnRods);              // ⬅️ botón "Rods"
+        tvInitialMessage = findViewById(R.id.tvInitialMessage);     // ⬅️ texto "Select a category..."
 
         api = RetrofitClient.getApiService();
         session = new SessionManager(this);
 
+        // RECYCLER Y ADAPTER
         adapter = new RodsAdapter(new ArrayList<>(), this::onBuyRodClicked);
         rvRods.setLayoutManager(new LinearLayoutManager(this));
         rvRods.setAdapter(adapter);
 
+        // Al entrar, solo cargamos el saldo
         loadBalance();
-        loadRods();
 
+        // Estado inicial: mostrar mensaje, ocultar lista
+        rvRods.setVisibility(View.GONE);
+        tvInitialMessage.setVisibility(View.VISIBLE);
+
+        // Botón volver
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(ShopActivity.this, MenuActivity.class);
             startActivity(intent);
             finish();
         });
+
+        // 🔹 CUANDO PULSAS RODS -> MOSTRAR LISTA Y CARGAR CAÑAS
+        btnRods.setOnClickListener(v -> {
+            tvInitialMessage.setVisibility(View.GONE); // ocultar mensaje inicial
+            rvRods.setVisibility(View.VISIBLE);        // mostrar RecyclerView
+            loadRods();                                // pedir cañas a la API
+        });
     }
+
+    // --- BALANCE / COINS ---
 
     private void loadBalance() {
         String token = session.getToken();
@@ -94,6 +116,8 @@ public class ShopActivity extends AppCompatActivity {
         });
     }
 
+    // --- CARGAR CAÑAS (RODS) ---
+
     private void loadRods() {
         progress.setVisibility(View.VISIBLE);
 
@@ -121,6 +145,8 @@ public class ShopActivity extends AppCompatActivity {
             }
         });
     }
+
+    // --- COMPRAR CAÑA ---
 
     private void onBuyRodClicked(FishingRod rod) {
         String token = session.getToken();

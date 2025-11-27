@@ -1,75 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="center_horizontal"
-    android:background="@drawable/fondo1">
-
-    <ImageView
-        android:id="@+id/ivLogoShop"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:src="@drawable/splash_logo"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="8dp"
-        android:scaleType="centerCrop" />
+    android:background="@drawable/shopbackground">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp">
 
-        <TextView
-            android:id="@+id/tvShopTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Shop"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#0D47A1"
-            android:layout_gravity="center" />
-
         <Button
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:text="Back"
-            android:backgroundTint="#4FA1E6"
-            android:paddingHorizontal="20dp"
+            android:background="@drawable/pixel_button_bg"
+            app:backgroundTint="@null"
+            android:fontFamily="@font/pixel_font"
+            android:paddingHorizontal="12dp"
             android:textAllCaps="false"
-            android:layout_gravity="end|center_vertical" />
+            android:textSize="14sp"
+            android:layout_gravity="start|center_vertical" />
+
+        <TextView
+            android:id="@+id/tvCoins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Coins: 0"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#FFC107"
+            android:fontFamily="@font/pixel_font"
+            android:layout_gravity="end|center_vertical"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp" />
     </FrameLayout>
 
     <TextView
-        android:id="@+id/tvCoins"
+        android:id="@+id/tvShopTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Coins: 0"
+        android:text="Welcome to the Shop"
+        android:textSize="26sp"
         android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="#1E88E5"
-        android:layout_marginBottom="12dp" />
+        android:textColor="#FFFF"
+        android:fontFamily="@font/pixel_font"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:id="@+id/llCategoryButtonsBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnRods"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:text="Rods"
+            android:background="@drawable/pixel_button_bg_brown"
+            app:backgroundTint="@null"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/pixel_font"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="12dp"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnBaits"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:text="Baits"
+            android:background="@drawable/pixel_button_bg_brown"
+            app:backgroundTint="@null"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/pixel_font"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="12dp"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnEquipment"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:text="Equipment"
+            android:background="@drawable/pixel_button_bg_brown"
+            app:backgroundTint="@null"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/pixel_font"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="12dp"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnSell"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:text="Sell"
+            android:background="@drawable/pixel_button_bg_brown"
+            app:backgroundTint="@null"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/pixel_font"
+            android:paddingHorizontal="12dp"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/flShopContent"
+        android:layout_width="411dp"
+        android:layout_height="206dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="10dp"
         android:background="@drawable/bg_login_card"
         android:elevation="6dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp">
+        android:padding="8dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRods"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="6dp" />
+            android:padding="6dp"
+            android:visibility="gone" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tvInitialMessage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Select a category to view items."
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:textColor="#FFFF"
+            android:fontFamily="@font/pixel_font" />
+    </FrameLayout>
 
     <ProgressBar
         android:id="@+id/progressShop"
@@ -78,6 +152,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:visibility="gone"
-        android:indeterminateTint="#2196F3" />
+        android:indeterminateTint="#2196F3"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

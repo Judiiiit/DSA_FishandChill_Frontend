@@ -44,7 +44,7 @@
         android:id="@+id/tvShopTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to the Shop"
+        android:text="Welcome to the Shop!"
         android:textSize="26sp"
         android:textStyle="bold"
         android:textColor="#FFFF"

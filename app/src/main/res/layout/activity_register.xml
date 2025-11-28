@@ -25,8 +25,8 @@
             android:src="@drawable/mainlogo" />
 
         <FrameLayout
-            android:layout_width="286dp"
-            android:layout_height="282dp"
+            android:layout_width="303dp"
+            android:layout_height="298dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="12dp"
             android:background="@drawable/bg_login_card">
@@ -123,7 +123,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/pixel_font"
                     android:paddingTop="3dp"
-                    android:textColor="@android:color/holo_red_light"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp" />
             </LinearLayout>
 

@@ -23,7 +23,7 @@
 
         <FrameLayout
             android:layout_width="272dp"
-            android:layout_height="281dp"
+            android:layout_height="292dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="12dp"
             android:background="@drawable/bg_login_card">
@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/pixel_font"
                     android:paddingTop="3dp"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp" />
 
                 <Button
@@ -106,7 +106,7 @@
                     android:layout_marginTop="6dp"
                     android:background="@drawable/pixel_button_bg"
                     android:fontFamily="@font/pixel_font"
-                    android:text="New player? Create an account"
+                    android:text="New player?"
                     android:textAllCaps="false"
                     android:textSize="12sp"
                     app:backgroundTint="@null" />
@@ -118,12 +118,14 @@
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
+            android:background="@drawable/pixel_button_bg"
+            android:fontFamily="@font/pixel_font"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
             android:text="Back"
             android:textAllCaps="false"
-            android:background="@drawable/pixel_button_bg"  app:backgroundTint="@null"  android:fontFamily="@font/pixel_font"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            app:backgroundTint="@null" />
 
     </LinearLayout>
 </ScrollView>

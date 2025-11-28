@@ -27,9 +27,6 @@ public class MenuActivity extends AppCompatActivity {
         btnGoShop = findViewById(R.id.btnGoShop);
         btnLogout = findViewById(R.id.btnLogout);
 
-        Toast.makeText(this, "Token actual: " + session.getToken(), Toast.LENGTH_LONG).show();
-
-
         btnGoGame.setOnClickListener(v ->
                 Toast.makeText(MenuActivity.this,
                         "Feature in production",

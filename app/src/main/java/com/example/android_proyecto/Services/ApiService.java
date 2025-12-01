@@ -11,6 +11,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -28,6 +29,9 @@ public interface ApiService {
     @POST("auth/login")
     Call<Token> login(@Body UserLogIn body);
 
+    @DELETE("auth/logout")
+    Call<ResponseBody> logout(@Header("Authorization") String token);
+
 
     // --- ME ---
 
@@ -40,6 +44,7 @@ public interface ApiService {
 
     @GET("me/owned_fishing_rods")
     Call<List<FishingRod>> getMyOwnedFishingRods(@Header("Authorization") String token);
+
 
 
     // --- CATALOG ---

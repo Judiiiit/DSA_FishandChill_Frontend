@@ -150,7 +150,7 @@
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="32dp"
         android:visibility="gone"
         android:indeterminateTint="#2196F3"
         android:layout_gravity="center_horizontal" />

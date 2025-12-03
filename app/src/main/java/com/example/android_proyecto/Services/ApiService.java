@@ -1,5 +1,6 @@
 package com.example.android_proyecto.Services;
 
+import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.User;
@@ -21,7 +22,7 @@ public interface ApiService {
 
     // --- AUTH ---
 
-    // Registro
+    // Register
     @POST("auth/register")
     Call<User> register(@Body UserRegister body);
 
@@ -29,6 +30,7 @@ public interface ApiService {
     @POST("auth/login")
     Call<Token> login(@Body UserLogIn body);
 
+    // Logout
     @DELETE("auth/logout")
     Call<ResponseBody> logout(@Header("Authorization") String token);
 
@@ -40,11 +42,10 @@ public interface ApiService {
 
     @GET("me/captured_fishes")
     Call<ResponseBody> getMyCapturedFishes(@Header("Authorization") String token);
-    // Nota: Deberías crear un modelo List<CapturedFish> y reemplazar ResponseBody
+    // TODO: create a CapturedFish model and use Call<List<CapturedFish>>
 
     @GET("me/owned_fishing_rods")
     Call<List<FishingRod>> getMyOwnedFishingRods(@Header("Authorization") String token);
-
 
 
     // --- CATALOG ---
@@ -75,4 +76,10 @@ public interface ApiService {
 
     @POST("game/captured")
     Call<ResponseBody> captureFish(@Header("Authorization") String token);
+
+
+    // --- FAQ ---
+
+    @GET("faqs")
+    Call<List<Faq>> getFaqs();
 }

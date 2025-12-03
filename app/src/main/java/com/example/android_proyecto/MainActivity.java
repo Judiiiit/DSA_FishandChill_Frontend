@@ -6,6 +6,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.android_proyecto.Activities.FaqActivity;
 import com.example.android_proyecto.Activities.LogInActivity;
 import com.example.android_proyecto.Activities.RegisterActivity;
 
@@ -18,11 +19,15 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnGoLogin = findViewById(R.id.btnGoLogin);
         Button btnGoRegister = findViewById(R.id.btnGoRegister);
+        Button btnFaq = findViewById(R.id.btnFaq);
 
         btnGoLogin.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, LogInActivity.class)));
 
         btnGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(MainActivity.this, RegisterActivity.class)));
+
+        btnFaq.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, FaqActivity.class)));
     }
 }

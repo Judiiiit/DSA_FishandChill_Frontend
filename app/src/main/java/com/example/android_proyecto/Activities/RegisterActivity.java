@@ -17,6 +17,7 @@ import com.example.android_proyecto.R;
 import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
+import com.example.android_proyecto.Services.SessionManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,6 +30,8 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressBar progress;
     private TextView tvMsg;
     private Button btnRegister, btnBack;
+
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,8 @@ public class RegisterActivity extends AppCompatActivity {
         tvMsg = findViewById(R.id.tvMsgRegister);
         api = RetrofitClient.getApiService();
         btnBack = findViewById(R.id.btnBack);
+
+        session = new SessionManager(this);
 
         btnRegister.setOnClickListener(v -> doRegister());
 
@@ -95,7 +100,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     User u = response.body();
-                    Toast.makeText(RegisterActivity.this, "Register completed", Toast.LENGTH_LONG).show();
+
+                    session.setEmail(username);
+
+                    Toast.makeText(RegisterActivity.this,
+                            "Register completed", Toast.LENGTH_LONG).show();
+
                     startActivity(new Intent(RegisterActivity.this, LogInActivity.class));
                     finish();
                 } else if (response.code() == 409) {

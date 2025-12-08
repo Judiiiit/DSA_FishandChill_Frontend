@@ -22,7 +22,9 @@ import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -40,9 +42,14 @@ public class ShopActivity extends AppCompatActivity {
     private Button btnRods;
     private TextView tvInitialMessage;
 
+    private Button btnInventory;
+
     private RodsAdapter adapter;
     private ApiService api;
     private SessionManager session;
+
+    private Set<String> ownedRodNames = new HashSet<>();
+    private final List<FishingRod> ownedRods = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,12 +62,15 @@ public class ShopActivity extends AppCompatActivity {
         progress         = findViewById(R.id.progressShop);
         btnBack          = findViewById(R.id.btnBack);
         btnRods          = findViewById(R.id.btnRods);
+        btnInventory     = findViewById(R.id.btnInventory);
         tvInitialMessage = findViewById(R.id.tvInitialMessage);
 
         api = RetrofitClient.getApiService();
         session = new SessionManager(this);
 
-        adapter = new RodsAdapter(new ArrayList<>(), this::onBuyRodClicked);
+        ownedRodNames = session.getOwnedRods();
+
+        adapter = new RodsAdapter(new ArrayList<>(), this::onBuyRodClicked, ownedRodNames);
         rvRods.setLayoutManager(new GridLayoutManager(this, 2));
         rvRods.setAdapter(adapter);
 
@@ -78,7 +88,19 @@ public class ShopActivity extends AppCompatActivity {
         btnRods.setOnClickListener(v -> {
             tvInitialMessage.setVisibility(View.GONE);
             rvRods.setVisibility(View.VISIBLE);
+            adapter.setInventoryMode(false);
+            adapter.setOwnedRodNames(ownedRodNames);
             loadRods();
+        });
+
+        btnInventory.setOnClickListener(v -> {
+            tvInitialMessage.setVisibility(View.GONE);
+            rvRods.setVisibility(View.VISIBLE);
+
+            adapter.setInventoryMode(true);
+            adapter.setOwnedRodNames(ownedRodNames);
+
+            adapter.setRods(new ArrayList<>(ownedRods));
         });
     }
 
@@ -123,6 +145,12 @@ public class ShopActivity extends AppCompatActivity {
                     List<FishingRod> rods = response.body();
                     adapter.setRods(rods);
 
+                    ownedRods.clear();
+                    for (FishingRod rod : rods) {
+                        if (ownedRodNames.contains(rod.getName())) {
+                            ownedRods.add(rod);
+                        }
+                    }
                     if (rods.isEmpty()) {
                         Toast.makeText(ShopActivity.this, "The shop is empty.", Toast.LENGTH_SHORT).show();
                     }
@@ -139,6 +167,32 @@ public class ShopActivity extends AppCompatActivity {
         });
     }
 
+    private void showInventory() {
+        if (ownedRods.isEmpty()) {
+            Toast.makeText(this, "You haven't bought any rods yet.", Toast.LENGTH_SHORT).show();
+            adapter.setRods(new ArrayList<>()); // lista vacía
+            return;
+        }
+
+        adapter.setRods(new ArrayList<>(ownedRods));
+    }
+
+    private void addRodToInventory(FishingRod rod) {
+        if (rod == null || rod.getName() == null) return;
+
+        for (FishingRod r : ownedRods) {
+            if (rod.getName().equals(r.getName())) {
+                return;
+            }
+        }
+
+        ownedRods.add(rod);
+
+        if (!ownedRodNames.contains(rod.getName())) {
+            ownedRodNames.add(rod.getName());
+            session.saveOwnedRods(ownedRodNames);
+        }
+    }
 
     private void onBuyRodClicked(FishingRod rod) {
         String token = session.getToken();
@@ -157,6 +211,7 @@ public class ShopActivity extends AppCompatActivity {
 
                 if (response.isSuccessful()) {
                     Toast.makeText(ShopActivity.this, "You purchased: " + rod.getName() + "!", Toast.LENGTH_SHORT).show();
+                    addRodToInventory(rod);
                     loadBalance();
                     return;
                 }

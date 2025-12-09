@@ -100,7 +100,7 @@ public class ShopActivity extends AppCompatActivity {
             adapter.setInventoryMode(true);
             adapter.setOwnedRodNames(ownedRodNames);
 
-            adapter.setRods(new ArrayList<>(ownedRods));
+            loadInventoryFromServer();
         });
     }
 
@@ -194,6 +194,53 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
 
+    private void loadInventoryFromServer() {
+        String token = session.getToken();
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "No active session. Please log in.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        progress.setVisibility(View.VISIBLE);
+
+        api.getMyOwnedFishingRods(token).enqueue(new Callback<List<FishingRod>>() {
+            @Override
+            public void onResponse(Call<List<FishingRod>> call, Response<List<FishingRod>> response) {
+                progress.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    List<FishingRod> rods = response.body();
+
+                    ownedRods.clear();
+                    ownedRodNames.clear();
+
+                    for (FishingRod rod : rods) {
+                        ownedRods.add(rod);
+                        if (rod.getName() != null) {
+                            ownedRodNames.add(rod.getName());
+                        }
+                    }
+
+                    session.saveOwnedRods(ownedRodNames);
+
+                    showInventory();
+                } else {
+                    Toast.makeText(ShopActivity.this,
+                            "Error loading inventory. Code: " + response.code(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<FishingRod>> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+                Toast.makeText(ShopActivity.this,
+                        "Connection error while loading inventory: " + t.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void onBuyRodClicked(FishingRod rod) {
         String token = session.getToken();
 
@@ -212,6 +259,7 @@ public class ShopActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(ShopActivity.this, "You purchased: " + rod.getName() + "!", Toast.LENGTH_SHORT).show();
                     addRodToInventory(rod);
+                    adapter.setOwnedRodNames(ownedRodNames);
                     loadBalance();
                     return;
                 }

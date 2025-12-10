@@ -1,131 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondologin">
+    android:background="@drawable/fondologin"
+    android:backgroundTintMode="src_in">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="8dp"    android:paddingBottom="8dp"  android:paddingStart="40dp"
-        android:paddingEnd="40dp"
-        android:gravity="center">
+    <FrameLayout
+        android:id="@+id/frameLayout3"
+        android:layout_width="303dp"
+        android:layout_height="298dp"
+        android:background="@drawable/bg_login_card"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/ivLogo"
-            android:layout_width="120dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"    android:layout_marginBottom="8dp"
-            android:contentDescription="@string/app_name"
-            android:scaleType="fitCenter"
-            android:src="@drawable/mainlogo" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:weightSum="6">
 
-        <FrameLayout
-            android:layout_width="272dp"
-            android:layout_height="292dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_login_card">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:orientation="vertical"
-                android:padding="10dp">
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:fontFamily="@font/pixel_font"
+                android:paddingBottom="8dp"
+                android:text="LogIn"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:fontFamily="@font/pixel_font"
-                    android:paddingBottom="8dp"
-                    android:text="LogIn"
-                    android:textColor="#333333"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+            <EditText
+                android:id="@+id/etUser"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@drawable/edittext_rounded"
+                android:fontFamily="@font/pixel_font"
+                android:hint="Username"
+                android:inputType="textPersonName"
+                android:padding="6dp"
+                android:textSize="14sp"
+                android:layout_weight="1"/>
 
-                <EditText
-                    android:id="@+id/etUser"
-                    android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:background="@drawable/edittext_rounded"
-                    android:fontFamily="@font/pixel_font"
-                    android:hint="Username"
-                    android:inputType="textPersonName"
-                    android:padding="6dp"
-                    android:textSize="14sp" />
+            <EditText
+                android:id="@+id/etPass"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/edittext_rounded"
+                android:fontFamily="@font/pixel_font"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:padding="6dp"
+                android:textSize="14sp"
+                android:layout_weight="1"/>
 
-                <EditText
-                    android:id="@+id/etPass"
-                    android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/edittext_rounded"
-                    android:fontFamily="@font/pixel_font"
-                    android:hint="Password"
-                    android:inputType="textPassword"
-                    android:padding="6dp"
-                    android:textSize="14sp" />
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/pixel_button_bg"
+                android:fontFamily="@font/pixel_font"
+                android:text="Validate"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                android:layout_weight="2"/>
 
-                <Button
-                    android:id="@+id/btnLogin"
-                    android:layout_width="match_parent"
-                    android:layout_height="34dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/pixel_button_bg"
-                    android:fontFamily="@font/pixel_font"
-                    android:text="Validate"
-                    android:textAllCaps="false"
-                    android:textSize="14sp"
-                    app:backgroundTint="@null" />
+            <ProgressBar
+                android:id="@+id/progressLogin"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="3dp"
+                android:visibility="gone" />
 
-                <ProgressBar
-                    android:id="@+id/progressLogin"
-                    style="?android:attr/progressBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="3dp"
-                    android:visibility="gone" />
+            <TextView
+                android:id="@+id/tvMsgLogin"
+                android:layout_width="match_parent"
+                android:layout_height="51dp"
+                android:fontFamily="@font/pixel_font"
+                android:paddingTop="3dp"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:layout_weight="1"/>
 
-                <TextView
-                    android:id="@+id/tvMsgLogin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/pixel_font"
-                    android:paddingTop="3dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp" />
 
-                <Button
-                    android:id="@+id/btnCreateAccount"
-                    android:layout_width="match_parent"
-                    android:layout_height="34dp"
-                    android:layout_marginTop="6dp"
-                    android:background="@drawable/pixel_button_bg"
-                    android:fontFamily="@font/pixel_font"
-                    android:text="New player?"
-                    android:textAllCaps="false"
-                    android:textSize="12sp"
-                    app:backgroundTint="@null" />
-            </LinearLayout>
+        </LinearLayout>
 
-        </FrameLayout>
+    </FrameLayout>
 
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:background="@drawable/pixel_button_bg"
-            android:fontFamily="@font/pixel_font"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:text="Back"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            app:backgroundTint="@null" />
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:background="@drawable/pixel_button_bg"
+        android:fontFamily="@font/pixel_font"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:text="Back"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout3" />
 
-    </LinearLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,66 +2,88 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="3dp"
     android:orientation="vertical"
+    android:background="@drawable/bg_rod_card"
     android:padding="6dp">
 
+    <!-- NAME ON TOP -->
+    <TextView
+        android:id="@+id/tvRodName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pixel_font"
+        android:paddingBottom="6dp"
+        android:text="Caña básica"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- MIDDLE: IMAGE LEFT + DESC RIGHT -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgRod"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" />
+
+        <!-- CONTENEDOR PARA DISTRIBUIR EL TEXTO VERTICALMENTE -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRodDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pixel_font"
+                android:text="Speed: 1\nPower: 1\nRarity: Common"
+                android:textColor="#DDDDDD"
+                android:textSize="11sp"
+                android:gravity="center"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <!-- BOTTOM: PRICE LEFT + BUTTON BOTTOM-RIGHT -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/bg_rod_card"
-        android:padding="8dp"
-        android:layout_margin="4dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="6dp">
 
         <TextView
-            android:id="@+id/tvRodName"
-            android:layout_width="match_parent"
+            android:id="@+id/tvRodPrice"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Caña básica"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:layout_weight="1"
             android:fontFamily="@font/pixel_font"
-            android:layout_marginBottom="4dp" />
+            android:text="Price: 100"
+            android:textAlignment="center"
+            android:textColor="#FFC107"
+            android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/tvRodDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Speed: 1  Power: 1  Rarity: Common"
-            android:textSize="11sp"
-            android:textColor="#DDDDDD"
-            android:fontFamily="@font/pixel_font"
-            android:layout_marginBottom="4dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/tvRodPrice"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Price: 100"
-                android:textSize="12sp"
-                android:textColor="#FFC107"
-                android:fontFamily="@font/pixel_font"
-                android:layout_marginEnd="8dp" />
-
-            <ImageButton
-                android:id="@+id/btnBuy"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="@drawable/pixel_button_bg"
-                android:src="@android:drawable/ic_menu_add"
-                android:scaleType="centerInside"
-                android:padding="4dp"
-                android:contentDescription="Comprar" />
-        </LinearLayout>
-
+        <ImageButton
+            android:id="@+id/btnBuy"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/pixel_button_bg"
+            android:contentDescription="Comprar"
+            android:padding="4dp"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_add" />
     </LinearLayout>
 
 </LinearLayout>

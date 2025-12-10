@@ -10,6 +10,8 @@ public class FishingRod {
         private int durability;   // total number of uses
         private int price;        // price in game currency
 
+        private String url;
+
         // Constructor vacío necesario para Gson
         public FishingRod() {
         }
@@ -69,5 +71,13 @@ public class FishingRod {
 
         public void setPrice(int price) {
             this.price = price;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
 }

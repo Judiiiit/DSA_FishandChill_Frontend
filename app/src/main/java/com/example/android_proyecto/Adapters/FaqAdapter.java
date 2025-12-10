@@ -3,6 +3,7 @@ package com.example.android_proyecto.Adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -46,10 +47,24 @@ public class FaqAdapter extends RecyclerView.Adapter<FaqAdapter.FaqViewHolder> {
         TextView tvQuestion;
         TextView tvAnswer;
 
+        ImageView imgArrow;
+
+
         public FaqViewHolder(@NonNull View itemView) {
             super(itemView);
             tvQuestion = itemView.findViewById(R.id.tvQuestion);
             tvAnswer = itemView.findViewById(R.id.tvAnswer);
+            imgArrow = itemView.findViewById(R.id.imgArrow);
+            imgArrow.setOnClickListener(v -> {
+
+                if (tvAnswer.getVisibility() == View.GONE) {
+                    tvAnswer.setVisibility(View.VISIBLE);
+                    imgArrow.setImageResource(android.R.drawable.arrow_up_float);
+                }
+                else {
+                    tvAnswer.setVisibility(View.GONE);
+                }
+            });
         }
     }
 }

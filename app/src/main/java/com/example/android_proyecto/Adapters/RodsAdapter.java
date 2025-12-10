@@ -5,13 +5,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.R;
+import com.example.android_proyecto.RetrofitClient;
+import com.example.android_proyecto.Services.ApiService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,12 +33,14 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
     private Set<String> ownedRodNames;
     private boolean inventoryMode = false;
 
+
     public RodsAdapter(List<FishingRod> rods,
                        OnRodClickListener listener,
                        Set<String> ownedRodNames) {
         this.rods = rods;
         this.listener = listener;
         this.ownedRodNames = ownedRodNames != null ? ownedRodNames : new HashSet<>();
+
     }
 
     @NonNull
@@ -53,8 +59,8 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
 
         // Aquí mostramos info con los campos reales del backend
         String desc = "Speed: " + rod.getSpeed()
-                + "  Power: " + rod.getPower()
-                + "  Rarity: " + rod.getRarity();
+                + " \nPower: " + rod.getPower()
+                + "\nRarity: " + rod.getRarity();
         holder.tvDesc.setText(desc);
 
         holder.tvPrice.setText("Price: " + rod.getPrice());
@@ -83,6 +89,11 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
                 });
             }
         }
+        Glide.with(holder.itemView.getContext())
+                .load(RetrofitClient.SERVER_URL + rod.getUrl())
+                .into(holder.imgRod);
+
+
     }
 
     @Override
@@ -109,12 +120,16 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
         TextView tvName, tvDesc, tvPrice;
         ImageButton btnBuy;
 
+        ImageView imgRod;
+
+
         RodViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvRodName);
             tvDesc = itemView.findViewById(R.id.tvRodDesc);
             tvPrice = itemView.findViewById(R.id.tvRodPrice);
             btnBuy = itemView.findViewById(R.id.btnBuy);
+            imgRod = itemView.findViewById(R.id.imgRod);
         }
     }
 }

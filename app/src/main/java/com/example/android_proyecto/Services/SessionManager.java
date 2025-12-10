@@ -9,7 +9,6 @@ public class SessionManager {
 
     private static final String PREF_NAME = "session_prefs";
     private static final String KEY_TOKEN = "token";
-    private static final String KEY_OWNED_RODS = "owned_rods";
 
     private static final String KEY_EMAIL = "email";
     private static final String KEY_OWNED_RODS_PREFIX = "owned_rods_";

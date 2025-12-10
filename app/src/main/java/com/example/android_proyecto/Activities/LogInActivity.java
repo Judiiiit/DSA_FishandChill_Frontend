@@ -41,14 +41,15 @@ public class LogInActivity extends AppCompatActivity {
         etUser = findViewById(R.id.etUser);
         etPass = findViewById(R.id.etPass);
         btnLogin = findViewById(R.id.btnLogin);
-        btnCreateAccount = findViewById(R.id.btnCreateAccount);
         progress = findViewById(R.id.progressLogin);
         tvMsg = findViewById(R.id.tvMsgLogin);
         btnBack = findViewById(R.id.btnBack);
 
-        api = RetrofitClient.getApiService();
 
+
+        api = RetrofitClient.getApiService();
         session = new SessionManager(this);
+
         String existingToken = session.getToken();
         if (existingToken != null) {
             startActivity(new Intent(LogInActivity.this, MenuActivity.class));
@@ -57,9 +58,6 @@ public class LogInActivity extends AppCompatActivity {
         }
 
         btnLogin.setOnClickListener(v -> doLogin());
-
-        btnCreateAccount.setOnClickListener(v ->
-                startActivity(new Intent(LogInActivity.this, RegisterActivity.class)));
 
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(LogInActivity.this, MainActivity.class);

@@ -1,6 +1,8 @@
 package com.example.android_proyecto.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -31,6 +33,11 @@ public class FaqActivity extends AppCompatActivity {
 
         recyclerFaqs = findViewById(R.id.recyclerFaqs);
         recyclerFaqs.setLayoutManager(new LinearLayoutManager(this));
+
+        Button btnAskQuestion = findViewById(R.id.btnAskQuestion);
+        btnAskQuestion.setOnClickListener(v ->
+                startActivity(new Intent(FaqActivity.this, AskQuestionActivity.class))
+        );
 
         loadFaqs();
     }

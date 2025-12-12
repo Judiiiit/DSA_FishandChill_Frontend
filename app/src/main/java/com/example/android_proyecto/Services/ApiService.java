@@ -2,6 +2,7 @@ package com.example.android_proyecto.Services;
 
 import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
+import com.example.android_proyecto.Models.QuestionRequest;
 import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserLogIn;
@@ -22,18 +23,14 @@ public interface ApiService {
 
     // --- AUTH ---
 
-    // Register
     @POST("auth/register")
     Call<User> register(@Body UserRegister body);
 
-    // Login
     @POST("auth/login")
     Call<Token> login(@Body UserLogIn body);
 
-    // Logout
     @DELETE("auth/logout")
     Call<ResponseBody> logout(@Header("Authorization") String token);
-
 
     // --- ME ---
 
@@ -42,11 +39,9 @@ public interface ApiService {
 
     @GET("me/captured_fishes")
     Call<ResponseBody> getMyCapturedFishes(@Header("Authorization") String token);
-    // TODO: create a CapturedFish model and use Call<List<CapturedFish>>
 
     @GET("me/owned_fishing_rods")
     Call<List<FishingRod>> getMyOwnedFishingRods(@Header("Authorization") String token);
-
 
     // --- CATALOG ---
 
@@ -62,7 +57,6 @@ public interface ApiService {
     @GET("catalog/fishes/{species_name}")
     Call<ResponseBody> getFishByName(@Path("species_name") String speciesName);
 
-
     // --- SHOP ---
 
     @POST("shop/fishing_rods/{fishing_rod_name}/buy")
@@ -71,15 +65,18 @@ public interface ApiService {
             @Path("fishing_rod_name") String rodName
     );
 
-
     // --- GAME ---
 
     @POST("game/captured")
     Call<ResponseBody> captureFish(@Header("Authorization") String token);
 
-
     // --- FAQ ---
 
     @GET("faqs")
     Call<List<Faq>> getFaqs();
+
+    // --- QUESTION ---
+
+    @POST("question")
+    Call<QuestionRequest> postQuestion(@Body QuestionRequest question);
 }

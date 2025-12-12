@@ -36,6 +36,7 @@
         <activity android:name=".Activities.RegisterActivity" android:exported="false" />
         <activity android:name=".Activities.MenuActivity" />
         <activity android:name=".Activities.FaqActivity" android:exported="false" />
+        <activity android:name=".Activities.AskQuestionActivity" />
 
     </application>
 </manifest>

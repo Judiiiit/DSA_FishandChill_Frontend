@@ -2,9 +2,13 @@ package com.example.android_proyecto.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android_proyecto.MainActivity;
@@ -21,6 +25,10 @@ import retrofit2.Response;
 public class MenuActivity extends AppCompatActivity {
 
     private Button btnGoGame, btnGoShop, btnLogout;
+    private ImageButton btnSettings;
+    private FrameLayout settingsPanel;
+    private Button btnBackFromSettings;
+
     private SessionManager session;
     private ApiService api;
 
@@ -36,13 +44,15 @@ public class MenuActivity extends AppCompatActivity {
         btnGoShop = findViewById(R.id.btnGoShop);
         btnLogout = findViewById(R.id.btnLogout);
 
+        btnSettings = findViewById(R.id.btnSettings);
+        settingsPanel = findViewById(R.id.settingsPanel);
+        btnBackFromSettings = findViewById(R.id.btnBackFromSettings);
+
         String token = session.getToken();
         Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();
 
         btnGoGame.setOnClickListener(v ->
-                Toast.makeText(MenuActivity.this,
-                        "Feature in production",
-                        Toast.LENGTH_SHORT).show()
+                Toast.makeText(MenuActivity.this, "Feature in production", Toast.LENGTH_SHORT).show()
         );
 
         btnGoShop.setOnClickListener(v -> {
@@ -51,24 +61,50 @@ public class MenuActivity extends AppCompatActivity {
         });
 
         btnLogout.setOnClickListener(v -> doLogout());
+
+        btnSettings.setOnClickListener(v -> openSettings());
+        btnBackFromSettings.setOnClickListener(v -> closeSettings());
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (settingsPanel != null && settingsPanel.getVisibility() == View.VISIBLE) {
+                    closeSettings();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+    }
+
+    private void openSettings() {
+        findViewById(R.id.frameLayout2).setVisibility(View.GONE);
+        settingsPanel.setVisibility(View.VISIBLE);
+        btnBackFromSettings.setVisibility(View.VISIBLE);
+        btnSettings.setVisibility(View.GONE);
+    }
+
+    private void closeSettings() {
+        findViewById(R.id.frameLayout2).setVisibility(View.VISIBLE);
+        settingsPanel.setVisibility(View.GONE);
+        btnBackFromSettings.setVisibility(View.GONE);
+        btnSettings.setVisibility(View.VISIBLE);
     }
 
     private void doLogout() {
         String token = session.getToken();
 
-        // If there is no token, just clear and go to main
         if (token == null) {
             session.clear();
             goToMain();
             return;
         }
 
-        // Call backend logout (this will delete the token from DB)
         Call<ResponseBody> call = api.logout(token);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                // Regardless of HTTP code, clear local session
                 session.clear();
                 Toast.makeText(MenuActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
                 goToMain();
@@ -76,11 +112,8 @@ public class MenuActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                // Even if there is a connection error, we clear local session
                 session.clear();
-                Toast.makeText(MenuActivity.this,
-                        "Logged out (connection error: " + t.getMessage() + ")",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(MenuActivity.this, "Logged out (connection error: " + t.getMessage() + ")", Toast.LENGTH_SHORT).show();
                 goToMain();
             }
         });

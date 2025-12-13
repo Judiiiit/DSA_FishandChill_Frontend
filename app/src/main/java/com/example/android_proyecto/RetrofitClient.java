@@ -14,8 +14,8 @@ public class RetrofitClient {
     private static Retrofit retrofit;
 
     public static final String SERVER_URL = "https://dsa1.upc.edu";
-    private static final String BASE_URL = SERVER_URL + "/api/";
-    //private static final String BASE_URL = "http://10.0.2.2:8080/api/";
+    //private static final String BASE_URL = SERVER_URL + "/api/";
+    private static final String BASE_URL = "http://10.0.2.2:8080/api/";
 
     public static Retrofit getRetrofit() {
         if (retrofit == null) {

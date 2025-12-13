@@ -43,6 +43,10 @@ public interface ApiService {
     @GET("me/owned_fishing_rods")
     Call<List<FishingRod>> getMyOwnedFishingRods(@Header("Authorization") String token);
 
+    @DELETE("me")
+    Call<ResponseBody> deleteMe(@Header("Authorization") String token);
+
+
     // --- CATALOG ---
 
     @GET("catalog/fishing_rods")

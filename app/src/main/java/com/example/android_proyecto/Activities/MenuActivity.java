@@ -49,7 +49,7 @@ public class MenuActivity extends AppCompatActivity {
         btnBackFromSettings = findViewById(R.id.btnBackFromSettings);
 
         String token = session.getToken();
-        Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();
 
         btnGoGame.setOnClickListener(v ->
                 Toast.makeText(MenuActivity.this, "Feature in production", Toast.LENGTH_SHORT).show()

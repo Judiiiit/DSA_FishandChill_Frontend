@@ -33,8 +33,7 @@ android:layout_margin="6dp">
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:padding="2dp"
-            android:src="@android:drawable/arrow_down_float"
-            android:tint="#FFFFFF" />
+            android:src="@android:drawable/arrow_down_float"/>
     </LinearLayout>
 
 <!-- RESPUESTA -->

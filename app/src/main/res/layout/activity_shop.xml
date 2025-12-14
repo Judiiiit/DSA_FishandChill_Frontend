@@ -1,144 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center_horizontal"
     android:background="@drawable/shopbackground">
 
-    <FrameLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/pixel_button_bg"
+        android:fontFamily="@font/pixel_font"
+        android:paddingHorizontal="12dp"
+        android:text="Back"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/tvCoins"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="8dp">
-
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:text="Back"
-            android:background="@drawable/pixel_button_bg"
-            app:backgroundTint="@null"
-            android:fontFamily="@font/pixel_font"
-            android:paddingHorizontal="12dp"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            android:layout_gravity="start|center_vertical" />
-
-        <TextView
-            android:id="@+id/tvCoins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Coins: 0"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="#FFC107"
-            android:fontFamily="@font/pixel_font"
-            android:layout_gravity="end|center_vertical"
-            android:paddingEnd="10dp"
-            android:paddingStart="10dp" />
-    </FrameLayout>
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/pixel_font"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="Coins: 0"
+        android:textColor="#FFC107"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/tvShopTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/pixel_font"
         android:text="Welcome to the Shop!"
+        android:textColor="#FFFF"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:textColor="#FFFF"
-        android:fontFamily="@font/pixel_font"
-        android:layout_marginBottom="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center_horizontal" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.100000024" />
 
-    <LinearLayout
-        android:id="@+id/llCategoryButtonsBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp">
-
-        <Button
-            android:id="@+id/btnRods"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:text="Rods"
-            android:background="@drawable/pixel_button_bg_brown"
-            app:backgroundTint="@null"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/pixel_font"
-            android:layout_marginEnd="8dp"
-            android:paddingHorizontal="12dp"
-            android:textAllCaps="false"
-            android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/btnBaits"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:text="Baits"
-            android:background="@drawable/pixel_button_bg_brown"
-            app:backgroundTint="@null"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/pixel_font"
-            android:layout_marginEnd="8dp"
-            android:paddingHorizontal="12dp"
-            android:textAllCaps="false"
-            android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/btnEquipment"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:text="Equipment"
-            android:background="@drawable/pixel_button_bg_brown"
-            app:backgroundTint="@null"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/pixel_font"
-            android:layout_marginEnd="8dp"
-            android:paddingHorizontal="12dp"
-            android:textAllCaps="false"
-            android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/btnSell"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:text="Sell"
-            android:background="@drawable/pixel_button_bg_brown"
-            app:backgroundTint="@null"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/pixel_font"
-            android:layout_marginEnd="8dp"
-            android:paddingHorizontal="12dp"
-            android:textAllCaps="false"
-            android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/btnInventory"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:text="Inventory"
-            android:background="@drawable/pixel_button_bg_brown"
-            app:backgroundTint="@null"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/pixel_font"
-            android:paddingHorizontal="12dp"
-            android:textAllCaps="false"
-            android:textSize="14sp" />
-    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/flShopContent"
-        android:layout_width="411dp"
-        android:layout_height="206dp"
+        android:layout_width="482dp"
+        android:layout_height="261dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:background="@drawable/bg_login_card"
         android:elevation="6dp"
-        android:padding="8dp">
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.72"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRods"
@@ -151,22 +92,92 @@
             android:id="@+id/tvInitialMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fontFamily="@font/pixel_font"
             android:gravity="center"
             android:text="Select a category to view items."
-            android:textSize="18sp"
-            android:textStyle="italic"
             android:textColor="#FFFF"
-            android:fontFamily="@font/pixel_font" />
+            android:textSize="18sp"
+            android:textStyle="italic" />
+
+
+        <ProgressBar
+            android:id="@+id/progressShop"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:visibility="gone"
+            android:indeterminateTint="#2196F3"
+            android:layout_gravity="center_horizontal" />
+
     </FrameLayout>
 
-    <ProgressBar
-        android:id="@+id/progressShop"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:visibility="gone"
-        android:indeterminateTint="#2196F3"
-        android:layout_gravity="center_horizontal" />
 
-</LinearLayout>
+
+    <Button
+        android:id="@+id/btnRods"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/pixel_button_bg_brown"
+        android:fontFamily="@font/pixel_font"
+        android:paddingHorizontal="12dp"
+        android:text="Rods"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toTopOf="@+id/btnInventory"
+        app:layout_constraintEnd_toStartOf="@+id/flShopContent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnEquipment"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:background="@drawable/pixel_button_bg_brown"
+        android:fontFamily="@font/pixel_font"
+        android:paddingHorizontal="12dp"
+        android:text="Equipment"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="invisible" />
+
+    <Button
+        android:id="@+id/btnInventory"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:background="@drawable/pixel_button_bg_brown"
+        android:fontFamily="@font/pixel_font"
+        android:paddingHorizontal="12dp"
+        android:text="Inventory"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/flShopContent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSell"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:background="@drawable/pixel_button_bg_brown"
+        android:fontFamily="@font/pixel_font"
+        android:paddingHorizontal="12dp"
+        android:text="Sell"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:visibility="invisible"
+        app:backgroundTint="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

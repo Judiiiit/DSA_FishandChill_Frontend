@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/pixel_font"
+        android:gravity="center"
         android:paddingBottom="6dp"
         android:text="Caña básica"
         android:textAlignment="center"
@@ -34,7 +35,6 @@
             android:adjustViewBounds="true"
             android:scaleType="centerCrop" />
 
-        <!-- CONTENEDOR PARA DISTRIBUIR EL TEXTO VERTICALMENTE -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -47,10 +47,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pixel_font"
+                android:gravity="center"
+                android:lineSpacingExtra="8sp"
                 android:text="Speed: 1\nPower: 1\nRarity: Common"
                 android:textColor="#DDDDDD"
-                android:textSize="11sp"
-                android:gravity="center"/>
+                android:textSize="11sp" />
         </LinearLayout>
 
     </LinearLayout>
@@ -70,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/pixel_font"
+            android:gravity="center"
             android:text="Price: 100"
             android:textAlignment="center"
             android:textColor="#FFC107"

@@ -34,6 +34,10 @@ public class FaqActivity extends AppCompatActivity {
         recyclerFaqs = findViewById(R.id.recyclerFaqs);
         recyclerFaqs.setLayoutManager(new LinearLayoutManager(this));
 
+        Button btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
+
         Button btnAskQuestion = findViewById(R.id.btnAskQuestion);
         btnAskQuestion.setOnClickListener(v ->
                 startActivity(new Intent(FaqActivity.this, AskQuestionActivity.class))

@@ -3,7 +3,6 @@ package com.example.android_proyecto.Adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,8 +14,8 @@ import com.bumptech.glide.Glide;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
-import com.example.android_proyecto.Services.ApiService;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,27 +26,37 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
         void onBuyClick(FishingRod rod);
     }
 
-    private List<FishingRod> rods;
+    private List<FishingRod> rods = new ArrayList<>();
+    private Set<String> ownedRodNames = new HashSet<>();
     private OnRodClickListener listener;
+    private boolean isInventoryMode = false;
 
-    private Set<String> ownedRodNames;
-    private boolean inventoryMode = false;
-
-
-    public RodsAdapter(List<FishingRod> rods,
-                       OnRodClickListener listener,
-                       Set<String> ownedRodNames) {
-        this.rods = rods;
+    public RodsAdapter(OnRodClickListener listener) {
         this.listener = listener;
-        this.ownedRodNames = ownedRodNames != null ? ownedRodNames : new HashSet<>();
+    }
 
+    // Update the list of rods to display
+    public void setRods(List<FishingRod> rods) {
+        this.rods = rods != null ? rods : new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    // Update the list of names the user owns
+    public void setOwnedRodNames(Set<String> ownedRodNames) {
+        this.ownedRodNames = ownedRodNames != null ? ownedRodNames : new HashSet<>();
+        notifyDataSetChanged();
+    }
+
+    // Toggle between Shop view (buy buttons) and Inventory view (no buttons)
+    public void setInventoryMode(boolean isInventoryMode) {
+        this.isInventoryMode = isInventoryMode;
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public RodViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_rod, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rod, parent, false);
         return new RodViewHolder(v);
     }
 
@@ -56,72 +65,52 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
         FishingRod rod = rods.get(position);
 
         holder.tvName.setText(rod.getName());
-
-        // Aquí mostramos info con los campos reales del backend
-        String desc = "Speed: " + rod.getSpeed()
-                + " \nPower: " + rod.getPower()
-                + "\nRarity: " + rod.getRarity();
-        holder.tvDesc.setText(desc);
-
         holder.tvPrice.setText("Price: " + rod.getPrice());
 
-        boolean isOwned = ownedRodNames != null
-                && rod.getName() != null
-                && ownedRodNames.contains(rod.getName());
+        String desc = "Speed: " + String.format("%.1f", rod.getSpeed()) + "\nPower: " + String.format("%.1f", rod.getPower()) + "\nRarity: " + rod.getRarity();
+        holder.tvDesc.setText(desc);
 
-        if (inventoryMode) {
-            // MODO INVENTARIO: solo visualizar, sin opción de compra
+        Glide.with(holder.itemView.getContext())
+                .load(RetrofitClient.SERVER_URL + rod.getUrl())
+                .into(holder.imgRod);
+
+        // LOGIC: Handle Buy Button State
+        if (isInventoryMode) {
+            // Inventory Mode: Hide buy button completely
             holder.btnBuy.setVisibility(View.GONE);
-            holder.btnBuy.setOnClickListener(null);
         } else {
-            // MODO TIENDA: se muestra el botón
+            // Shop Mode: Show button
             holder.btnBuy.setVisibility(View.VISIBLE);
 
+            boolean isOwned = ownedRodNames.contains(rod.getName());
+
             if (isOwned) {
+                // Owned: Disable button and gray it out
                 holder.btnBuy.setEnabled(false);
-                holder.btnBuy.setAlpha(0.3f);          // se ve “apagado”
+                holder.btnBuy.setAlpha(0.4f);
+                holder.btnBuy.setImageResource(android.R.drawable.checkbox_on_background); // Optional: change icon to checkmark
                 holder.btnBuy.setOnClickListener(null);
             } else {
+                // Not Owned: Enable button
                 holder.btnBuy.setEnabled(true);
                 holder.btnBuy.setAlpha(1.0f);
+                holder.btnBuy.setImageResource(android.R.drawable.ic_menu_add); // Make sure you have a cart icon or similar
                 holder.btnBuy.setOnClickListener(v -> {
                     if (listener != null) listener.onBuyClick(rod);
                 });
             }
         }
-        Glide.with(holder.itemView.getContext())
-                .load(RetrofitClient.SERVER_URL + rod.getUrl())
-                .into(holder.imgRod);
-
-
     }
 
     @Override
     public int getItemCount() {
-        return rods != null ? rods.size() : 0;
-    }
-
-    public void setRods(List<FishingRod> rods) {
-        this.rods = rods;
-        notifyDataSetChanged();
-    }
-
-    public void setOwnedRodNames(Set<String> ownedRodNames) {
-        this.ownedRodNames = ownedRodNames != null ? ownedRodNames : new HashSet<>();
-        notifyDataSetChanged();
-    }
-
-    public void setInventoryMode(boolean inventoryMode) {
-        this.inventoryMode = inventoryMode;
-        notifyDataSetChanged();
+        return rods.size();
     }
 
     static class RodViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDesc, tvPrice;
         ImageButton btnBuy;
-
         ImageView imgRod;
-
 
         RodViewHolder(@NonNull View itemView) {
             super(itemView);

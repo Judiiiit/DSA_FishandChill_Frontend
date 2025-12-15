@@ -7,6 +7,7 @@ import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserLogIn;
 import com.example.android_proyecto.Models.UserRegister;
+import com.example.android_proyecto.Models.Video;
 
 import java.util.List;
 
@@ -74,13 +75,14 @@ public interface ApiService {
     @POST("game/captured")
     Call<ResponseBody> captureFish(@Header("Authorization") String token);
 
-    // --- FAQ ---
+    // --- INFO ---
 
-    @GET("faqs")
+    @GET("info/faqs")
     Call<List<Faq>> getFaqs();
 
-    // --- QUESTION ---
-
-    @POST("question")
+    @POST("info/question")
     Call<QuestionRequest> postQuestion(@Body QuestionRequest question);
+
+    @GET("info/videos")
+    Call<List<Video>> getVideos();
 }

@@ -59,14 +59,31 @@
         android:layout_height="32dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:layout_marginTop="56dp"
         android:background="@drawable/pixel_button_bg"
         android:fontFamily="@font/pixel_font"
-        android:text="FAQ"
+        android:text="FAQs"
         android:textSize="14sp"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.38"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnGoRegister" />
+
+    <Button
+        android:id="@+id/btnVideo"
+        android:layout_width="145dp"
+        android:layout_height="34dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:background="@drawable/pixel_button_bg"
+        android:fontFamily="@font/pixel_font"
+        android:text="VIDEOs"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.62"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGoRegister" />
 

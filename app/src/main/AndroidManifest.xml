@@ -31,12 +31,15 @@
         </activity>
 
         <activity android:name=".Activities.ShopActivity" />
-
         <activity android:name=".Activities.LogInActivity" android:exported="false" />
         <activity android:name=".Activities.RegisterActivity" android:exported="false" />
         <activity android:name=".Activities.MenuActivity" />
         <activity android:name=".Activities.FaqActivity" android:exported="false" />
         <activity android:name=".Activities.AskQuestionActivity" />
+        <activity android:name=".Activities.VideoActivity" android:exported="false"
+            android:hardwareAccelerated="true"
+            />
+
 
     </application>
 </manifest>

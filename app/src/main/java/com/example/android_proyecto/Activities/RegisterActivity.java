@@ -101,7 +101,6 @@ public class RegisterActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     User u = response.body();
 
-                    session.setEmail(username);
 
                     Toast.makeText(RegisterActivity.this,
                             "Register completed", Toast.LENGTH_LONG).show();

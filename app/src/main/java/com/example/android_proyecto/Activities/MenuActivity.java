@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -29,7 +30,9 @@ public class MenuActivity extends AppCompatActivity {
     private FrameLayout settingsPanel;
     private Button btnBackFromSettings;
 
+    private TextView tvWelcomeUser;
     private SessionManager session;
+
     private ApiService api;
 
     @Override
@@ -45,8 +48,13 @@ public class MenuActivity extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
 
         btnSettings = findViewById(R.id.btnSettings);
+
         settingsPanel = findViewById(R.id.settingsPanel);
         btnBackFromSettings = findViewById(R.id.btnBackFromSettings);
+        tvWelcomeUser = findViewById(R.id.tvWelcomeUser);
+
+        String username = session.getUsername();
+        tvWelcomeUser.setText("Welcome, " + username + "!");
 
         String token = session.getToken();
         //Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();

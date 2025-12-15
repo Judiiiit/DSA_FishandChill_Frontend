@@ -10,8 +10,8 @@ public class SessionManager {
     private static final String PREF_NAME = "session_prefs";
     private static final String KEY_TOKEN = "token";
 
-    private static final String KEY_EMAIL = "email";
-    private static final String KEY_OWNED_RODS_PREFIX = "owned_rods_";
+    private static final String USER_NAME = "username";
+
 
     private final SharedPreferences sp;
 
@@ -27,50 +27,24 @@ public class SessionManager {
         return sp.getString(KEY_TOKEN, null);
     }
 
-    public void saveOwnedRods(Set<String> rods) {
-        if (rods == null) return;
-
-        String key = getInventoryKey();
-        if (key == null) return;   // aún no sabemos quién es el jugador
-
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putStringSet(key, new HashSet<>(rods));
-        editor.apply();
+    public void saveUsername(String username) {
+        sp.edit().putString(USER_NAME, username).apply();
     }
 
-    public Set<String> getOwnedRods() {
-        String key = getInventoryKey();
-        if (key == null) {
-            return new HashSet<>();
-        }
-
-        Set<String> stored = sp.getStringSet(key, new HashSet<>());
-        return new HashSet<>(stored);
+    public String getUsername() {
+        return sp.getString(USER_NAME, null);
     }
 
-    public void setEmail(String email) {
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString(KEY_EMAIL, email);
-        editor.apply();
-    }
 
-    public String getEmail() {
-        return sp.getString(KEY_EMAIL, null);
-    }
-    private String getInventoryKey() {
-        String email = getEmail();
-        if (email == null || email.isEmpty()) {
-            return null;
-        }
-        return KEY_OWNED_RODS_PREFIX + email;
-    }
+
 
     public void clear() {
 
         SharedPreferences.Editor editor = sp.edit();
 
         editor.remove(KEY_TOKEN);
-        editor.remove(KEY_EMAIL);
+        editor.remove(USER_NAME);
+
 
         editor.apply();
     }

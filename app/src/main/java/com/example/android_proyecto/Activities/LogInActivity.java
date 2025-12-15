@@ -92,7 +92,7 @@ public class LogInActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Token token = response.body();
                     session.saveToken(token.getToken()); // Guardamos el token en SessionManager
-                    session.setEmail(username);
+                    session.saveUsername(username);
                     Toast.makeText(LogInActivity.this,
                             "Login successful", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(LogInActivity.this, MenuActivity.class);

@@ -2,12 +2,14 @@ package com.example.android_proyecto.Services;
 
 import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
+import com.example.android_proyecto.Models.Group;
 import com.example.android_proyecto.Models.QuestionRequest;
 import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserLogIn;
 import com.example.android_proyecto.Models.UserRegister;
 import com.example.android_proyecto.Models.Video;
+import com.example.android_proyecto.Models.Group;
 
 import java.util.List;
 
@@ -85,4 +87,13 @@ public interface ApiService {
 
     @GET("info/videos")
     Call<List<Video>> getVideos();
+
+    @GET("info/groups")
+    Call<List<Group>> getGroups();
+
+    @POST("info/groups/{groupId}/")
+    Call<ResponseBody> joinGroup(
+            @Header("Authorization") String token,
+            @Path("groupId") int groupId
+    );
 }

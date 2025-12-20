@@ -39,6 +39,7 @@
         <activity android:name=".Activities.VideoActivity" android:exported="false"
             android:hardwareAccelerated="true"
             />
+        <activity android:name=".Activities.GroupsActivity" android:exported="false"  />
 
 
     </application>

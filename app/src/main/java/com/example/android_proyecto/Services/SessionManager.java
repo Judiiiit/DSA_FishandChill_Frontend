@@ -12,6 +12,9 @@ public class SessionManager {
 
     private static final String USER_NAME = "username";
 
+    private static final String KEY_JOINED_GROUPS = "joined_groups";
+
+
 
     private final SharedPreferences sp;
 
@@ -35,7 +38,35 @@ public class SessionManager {
         return sp.getString(USER_NAME, null);
     }
 
+    public Set<Integer> getJoinedGroups() {
+        String username = getUsername();
+        if (username == null) return new HashSet<>();
 
+        Set<String> stored = sp.getStringSet(KEY_JOINED_GROUPS + username, new HashSet<>());
+        Set<Integer> result = new HashSet<>();
+
+        for (String s : stored) {
+            try {
+                result.add(Integer.parseInt(s));
+            } catch (NumberFormatException ignored) {}
+        }
+
+        return result;
+    }
+
+
+    public void addJoinedGroup(int groupId) {
+        String username = getUsername();
+        if (username == null) return;
+
+        Set<String> stored = new HashSet<>(
+                sp.getStringSet(KEY_JOINED_GROUPS + username, new HashSet<>())
+        );
+
+        stored.add(String.valueOf(groupId));
+
+        sp.edit().putStringSet(KEY_JOINED_GROUPS + username, stored).apply();
+    }
 
 
     public void clear() {
@@ -44,6 +75,7 @@ public class SessionManager {
 
         editor.remove(KEY_TOKEN);
         editor.remove(USER_NAME);
+        editor.remove(KEY_JOINED_GROUPS);
 
 
         editor.apply();

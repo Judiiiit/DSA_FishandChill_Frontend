@@ -20,6 +20,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/btnGroups"
+        android:layout_width="60dp"
+        android:layout_height="55dp"
+        android:background="@android:color/transparent"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/groups"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.871"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.044" />
+
     <ImageView
         android:id="@+id/ivGameLogo"
         android:layout_width="175dp"

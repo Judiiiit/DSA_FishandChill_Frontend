@@ -1,7 +1,9 @@
 package com.example.android_proyecto.Activities;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -60,9 +62,21 @@ public class MenuActivity extends AppCompatActivity {
         String token = session.getToken();
         //Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();
 
-        btnGoGame.setOnClickListener(v ->
-                Toast.makeText(MenuActivity.this, "Feature in production", Toast.LENGTH_SHORT).show()
-        );
+        btnGoGame.setOnClickListener(v -> {
+            try {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(
+                        "com.DSA1.DSA_Proyecto",
+                        "com.unity3d.player.UnityPlayerGameActivity"
+                ));
+                startActivity(intent);
+
+            } catch (Exception e) {
+                Toast.makeText(MenuActivity.this, "Install the unity app first", Toast.LENGTH_SHORT).show();
+                Log.e("UnityLaunchError", "Error launching Unity", e);
+            }
+        });
+
 
         btnGoShop.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, ShopActivity.class);

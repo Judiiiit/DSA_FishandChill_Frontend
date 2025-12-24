@@ -43,4 +43,8 @@
 
 
     </application>
+
+    <queries>
+        <package android:name="com.DSA1.DSA_Proyecto" />
+    </queries>
 </manifest>

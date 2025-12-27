@@ -1,5 +1,6 @@
 package com.example.android_proyecto.Activities;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android_proyecto.MainActivity;
@@ -38,6 +41,8 @@ public class MenuActivity extends AppCompatActivity {
 
     private ApiService api;
 
+    private ActivityResultLauncher<Intent> unityLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +68,20 @@ public class MenuActivity extends AppCompatActivity {
         tvWelcomeUser.setText("Welcome, " + username + "!");
 
         String token = session.getToken();
-        //Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();
+
+        unityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        // si Unity te devuelve algo
+                        String unityResult = result.getData().getStringExtra("unity_result");
+                        Log.d("UnityReturn", "unity_result=" + unityResult);
+                        Toast.makeText(this, "Unity result: " + unityResult, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("UnityReturn", "Unity cancelled or without data");
+                    }
+                }
+        );
 
         btnGoGame.setOnClickListener(v -> {
             try {
@@ -72,7 +90,9 @@ public class MenuActivity extends AppCompatActivity {
                         "com.DSA1.DSA_Proyecto",
                         "com.unity3d.player.UnityPlayerGameActivity"
                 ));
-                startActivity(intent);
+                intent.putExtra("token", session.getToken());
+
+                unityLauncher.launch(intent);
 
             } catch (Exception e) {
                 Toast.makeText(MenuActivity.this, "Install the unity app first", Toast.LENGTH_SHORT).show();

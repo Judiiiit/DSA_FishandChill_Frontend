@@ -1,5 +1,6 @@
 package com.example.android_proyecto.Services;
 
+import com.example.android_proyecto.Models.EventUser;
 import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.Models.Group;
@@ -96,4 +97,7 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("groupId") int groupId
     );
+    // --- EVENTS ---
+    @GET("events/{eventId}/users")
+    Call<List<EventUser>> getEventUsers(@Path("eventId") String eventId);
 }

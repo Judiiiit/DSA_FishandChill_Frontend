@@ -6,6 +6,20 @@
     android:background="@drawable/mainimg2"
     android:backgroundTintMode="src_in">
 
+    <Button
+        android:id="@+id/btnEventUsers"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/pixel_button_bg"
+        android:fontFamily="@font/pixel_font"
+        android:text="Events"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        app:backgroundTint="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <ImageButton
         android:id="@+id/btnSettings"
         android:layout_width="60dp"

@@ -37,8 +37,9 @@
         <activity android:name=".Activities.FaqActivity" android:exported="false" />
         <activity android:name=".Activities.AskQuestionActivity" />
         <activity android:name=".Activities.VideoActivity" android:exported="false"
-            android:hardwareAccelerated="true"
-            />
+            android:hardwareAccelerated="true" />
+        <activity android:name=".Activities.EventUsersActivity" />
+        <activity android:name=".Activities.ChooseEventSplitActivity" />
         <activity android:name=".Activities.GroupsActivity" android:exported="false"  />
 
 

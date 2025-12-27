@@ -31,6 +31,7 @@ public class MenuActivity extends AppCompatActivity {
     private ImageButton btnSettings, btnGroups;
     private FrameLayout settingsPanel;
     private Button btnBackFromSettings;
+    private Button btnEventUsers;
 
     private TextView tvWelcomeUser;
     private SessionManager session;
@@ -56,6 +57,8 @@ public class MenuActivity extends AppCompatActivity {
         btnBackFromSettings = findViewById(R.id.btnBackFromSettings);
         tvWelcomeUser = findViewById(R.id.tvWelcomeUser);
 
+        btnEventUsers = findViewById(R.id.btnEventUsers);
+
         String username = session.getUsername();
         tvWelcomeUser.setText("Welcome, " + username + "!");
 
@@ -77,7 +80,6 @@ public class MenuActivity extends AppCompatActivity {
             }
         });
 
-
         btnGoShop.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, ShopActivity.class);
             startActivity(intent);
@@ -90,6 +92,12 @@ public class MenuActivity extends AppCompatActivity {
         btnGroups.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, GroupsActivity.class);
             startActivity(intent);
+        });
+
+        // ✅ AÑADIDO: listener del botón Events
+        btnEventUsers.setOnClickListener(v -> {
+            Intent i = new Intent(MenuActivity.this, ChooseEventSplitActivity.class);
+            startActivity(i);
         });
 
         btnBackFromSettings.setOnClickListener(v -> closeSettings());

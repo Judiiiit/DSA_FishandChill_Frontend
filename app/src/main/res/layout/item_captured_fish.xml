@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="3dp"
+    android:orientation="vertical"
+    android:background="@drawable/bg_rod_card"
+    android:padding="6dp">
+
+    <!-- NAME ON TOP -->
+    <TextView
+        android:id="@+id/tvFishName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pixel_font"
+        android:gravity="center"
+        android:paddingBottom="6dp"
+        android:text="Crystalline"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- IMAGE + DESCRIPTION -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgFish"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvFishDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pixel_font"
+                android:gravity="left"
+                android:lineSpacingExtra="8sp"
+                android:text="Weight: 2.10 kg\nRarity: Common\nCaught: 2025-12-24"
+                android:textColor="#DDDDDD"
+                android:textSize="7sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- VALUE + SELL BUTTON -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="6dp">
+
+        <TextView
+            android:id="@+id/tvFishValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/pixel_font"
+            android:gravity="center"
+            android:text="Value: 5"
+            android:textAlignment="center"
+            android:textColor="#FFC107"
+            android:textSize="12sp" />
+
+        <ImageButton
+            android:id="@+id/btnSellFish"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/pixel_button_bg"
+            android:contentDescription="Sell"
+            android:padding="4dp"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_add" />
+    </LinearLayout>
+
+</LinearLayout>

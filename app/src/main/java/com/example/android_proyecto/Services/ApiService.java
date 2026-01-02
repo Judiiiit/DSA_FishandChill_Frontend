@@ -1,5 +1,6 @@
 package com.example.android_proyecto.Services;
 
+import com.example.android_proyecto.Models.CapturedFish;
 import com.example.android_proyecto.Models.EventUser;
 import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
@@ -10,7 +11,6 @@ import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserLogIn;
 import com.example.android_proyecto.Models.UserRegister;
 import com.example.android_proyecto.Models.Video;
-import com.example.android_proyecto.Models.Group;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public interface ApiService {
     Call<User> getProfile(@Header("Authorization") String token);
 
     @GET("me/captured_fishes")
-    Call<ResponseBody> getMyCapturedFishes(@Header("Authorization") String token);
+    Call<List<CapturedFish>> getMyCapturedFishes(@Header("Authorization") String token);
 
     @GET("me/owned_fishing_rods")
     Call<List<FishingRod>> getMyOwnedFishingRods(@Header("Authorization") String token);

@@ -1,50 +1,32 @@
 package com.example.android_proyecto.Models;
 
+import com.google.gson.annotations.SerializedName;
 import java.sql.Timestamp;
 
 public class CapturedFish {
 
-    private String id;          // uuid
-    private Fish speciesFish;   // fish species information
+    private String id;
+
+    @SerializedName("fishSpecies")
+    private Fish speciesFish;
+
     private double weight;
-    private Timestamp captureTime; // time of capture
+    private Timestamp captureTime;
 
-    public CapturedFish() {
-    }
+    public CapturedFish() {}
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public Fish getSpeciesFish() { return speciesFish; }
+    public void setSpeciesFish(Fish speciesFish) { this.speciesFish = speciesFish; }
 
-    public Fish getSpeciesFish() {
-        return speciesFish;
-    }
+    public double getWeight() { return weight; }
+    public void setWeight(double weight) { this.weight = weight; }
 
-    public void setSpeciesFish(Fish speciesFish) {
-        this.speciesFish = speciesFish;
-    }
+    public Timestamp getCaptureTime() { return captureTime; }
+    public void setCaptureTime(Timestamp captureTime) { this.captureTime = captureTime; }
 
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-    public Timestamp getCaptureTime() {
-        return captureTime;
-    }
-
-    public void setCaptureTime(Timestamp captureTime) {
-        this.captureTime = captureTime;
-    }
-
-    // Helper similar al del backend, por si te hace falta en la UI
     public String getSpeciesId() {
         return this.speciesFish != null ? this.speciesFish.getId() : null;
     }

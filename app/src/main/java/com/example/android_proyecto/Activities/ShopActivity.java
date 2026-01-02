@@ -18,6 +18,10 @@ import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
+import com.example.android_proyecto.Adapters.CapturedFishAdapter;
+import com.example.android_proyecto.Models.CapturedFish;
+
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,11 +36,12 @@ import retrofit2.Response;
 public class ShopActivity extends AppCompatActivity {
 
     private TextView tvCoins, tvInitialMessage;
-    private RecyclerView rvRods;
+    private RecyclerView rvRods, rvFishes;
     private ProgressBar progress;
-    private Button btnBack, btnRods, btnInventory;
+    private Button btnBack, btnRods, btnInventory, btnFishes;
 
     private RodsAdapter adapter;
+    private CapturedFishAdapter fishesAdapter;
     private ApiService api;
     private SessionManager session;
     private String token;
@@ -44,6 +49,9 @@ public class ShopActivity extends AppCompatActivity {
     // LOCAL DATA STORAGE
     private List<FishingRod> allRodsList = new ArrayList<>();
     private Set<String> ownedRodNames = new HashSet<>();
+    private final Set<String> soldFishKeys = new HashSet<>();
+    private List<CapturedFish> myFishes = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +62,12 @@ public class ShopActivity extends AppCompatActivity {
         tvCoins = findViewById(R.id.tvCoins);
         tvInitialMessage = findViewById(R.id.tvInitialMessage);
         rvRods = findViewById(R.id.rvRods);
+        rvFishes = findViewById(R.id.rvFishes);
         progress = findViewById(R.id.progressShop);
         btnBack = findViewById(R.id.btnBack);
         btnRods = findViewById(R.id.btnRods);
         btnInventory = findViewById(R.id.btnInventory);
+        btnFishes = findViewById(R.id.btnFishes);
 
         // Init Service
         api = RetrofitClient.getApiService();
@@ -69,6 +79,20 @@ public class ShopActivity extends AppCompatActivity {
         rvRods.setLayoutManager(new GridLayoutManager(this, 2));
         rvRods.setAdapter(adapter);
 
+        fishesAdapter = new CapturedFishAdapter((capturedFish, coinsGained) -> {
+            // 1) Sum coins locally in UI (backend not modified) ------------------------------------- SE TENDRÁ Q MODIFICAR PARA Q SE ACTUALICE EN LE BACKEND
+            int current = extractCoins(tvCoins.getText().toString());
+            tvCoins.setText("Coins: " + (current + coinsGained));
+
+            // 2) Mark fish as sold so button becomes a tick + disabled
+            soldFishKeys.add(buildFishKey(capturedFish));
+            fishesAdapter.setSoldFishKeys(soldFishKeys);
+
+            Toast.makeText(ShopActivity.this, "Sold! +" + coinsGained + " coins", Toast.LENGTH_SHORT).show();
+        });
+        rvFishes.setLayoutManager(new GridLayoutManager(this, 2));
+        rvFishes.setAdapter(fishesAdapter);
+
         // Listeners
         btnBack.setOnClickListener(v -> finish());
 
@@ -77,6 +101,7 @@ public class ShopActivity extends AppCompatActivity {
 
         // Show Inventory (Owned Rods)
         btnInventory.setOnClickListener(v -> showInventoryView());
+        btnFishes.setOnClickListener(v -> showFishesView());
 
         // Initial Load
         loadAllShopData();
@@ -94,6 +119,7 @@ public class ShopActivity extends AppCompatActivity {
         progress.setVisibility(View.VISIBLE);
         tvInitialMessage.setVisibility(View.GONE);
         rvRods.setVisibility(View.GONE);
+        rvFishes.setVisibility(View.GONE);
 
         // 1. Load Balance
         api.getProfile(token).enqueue(new Callback<User>() {
@@ -144,7 +170,7 @@ public class ShopActivity extends AppCompatActivity {
                     }
 
                     // Default view is Shop
-                    showShopView();
+                    showInitialMessage();
                 }
             }
 
@@ -157,7 +183,20 @@ public class ShopActivity extends AppCompatActivity {
 
     // --- VIEW LOGIC ---
 
+    private void hideAllContent() {
+        rvRods.setVisibility(View.GONE);
+        rvFishes.setVisibility(View.GONE);
+        tvInitialMessage.setVisibility(View.GONE);
+    }
+
+    private void showInitialMessage() {
+        hideAllContent();
+        tvInitialMessage.setVisibility(View.VISIBLE);
+    }
+
     private void showShopView() {
+        hideAllContent();
+        rvRods.setVisibility(View.VISIBLE);
         // Pass "All Rods" to adapter
         adapter.setInventoryMode(false); // Enable buy buttons
         adapter.setOwnedRodNames(ownedRodNames); // Tell adapter what we own (to grey them out)
@@ -165,6 +204,8 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void showInventoryView() {
+        hideAllContent();
+        rvRods.setVisibility(View.VISIBLE);
         // Filter "All Rods" to find the objects that match our "Owned Names"
         List<FishingRod> myInventory = new ArrayList<>();
         for (FishingRod rod : allRodsList) {
@@ -177,6 +218,47 @@ public class ShopActivity extends AppCompatActivity {
         adapter.setInventoryMode(true); // Hide buy buttons
         adapter.setRods(myInventory);
     }
+
+    private void showFishesView() {
+        hideAllContent();
+        rvFishes.setVisibility(View.VISIBLE);
+        loadMyFishes();
+    }
+
+
+    // --- FISHES LOAD ---
+
+    private void loadMyFishes() {
+        if (token == null) return;
+
+        progress.setVisibility(View.VISIBLE);
+
+        api.getMyCapturedFishes(token).enqueue(new Callback<List<CapturedFish>>() {
+            @Override
+            public void onResponse(Call<List<CapturedFish>> call, Response<List<CapturedFish>> response) {
+                progress.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    myFishes = response.body();
+                    fishesAdapter.setFishes(myFishes);
+                    fishesAdapter.setSoldFishKeys(soldFishKeys);
+
+                    if (myFishes.isEmpty()) {
+                        Toast.makeText(ShopActivity.this, "No fishes captured", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ShopActivity.this, "Error loading fishes", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<CapturedFish>> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+                Toast.makeText(ShopActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     // --- BUY LOGIC ---
 
@@ -223,4 +305,32 @@ public class ShopActivity extends AppCompatActivity {
             @Override public void onFailure(Call<User> call, Throwable t) {}
         });
     }
+
+
+    // --- HELPERS ---
+
+    private int extractCoins(String text) {
+        try {
+            String digits = text.replaceAll("[^0-9]", "");
+            return digits.isEmpty() ? 0 : Integer.parseInt(digits);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private String buildFishKey(CapturedFish cf) {
+        String name = "Unknown";
+        if (cf != null && cf.getSpeciesFish() != null && cf.getSpeciesFish().getSpeciesName() != null) {
+            name = cf.getSpeciesFish().getSpeciesName();
+        }
+
+        double weight = (cf != null) ? cf.getWeight() : 0.0;
+
+        Timestamp ts = (cf != null) ? cf.getCaptureTime() : null;
+        String time = (ts != null) ? ts.toString() : "-";
+
+        return name + "|" + String.format("%.4f", weight) + "|" + time;
+    }
+
+
 }

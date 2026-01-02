@@ -81,8 +81,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- RODS -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRods"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="6dp"
+            android:visibility="gone" />
+
+        <!-- FISHES -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFishes"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="6dp"
@@ -105,10 +114,10 @@
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
-            android:visibility="gone"
             android:indeterminateTint="#2196F3"
-            android:layout_gravity="center_horizontal" />
+            android:visibility="gone" />
 
     </FrameLayout>
 
@@ -163,6 +172,25 @@
         app:layout_constraintEnd_toStartOf="@+id/flShopContent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnFishes"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/pixel_button_bg_brown"
+        android:fontFamily="@font/pixel_font"
+        android:paddingHorizontal="12dp"
+        android:text="Fishes"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/flShopContent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnInventory"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/btnSell"

@@ -6,6 +6,7 @@ public class Fish {
     private String speciesName;   // species name
     private int rarity;           // rarity level
     private double speciesWeight; // standard weight of the species
+    private String url;
 
     public Fish() {
     }
@@ -40,5 +41,13 @@ public class Fish {
 
     public void setSpeciesWeight(double speciesWeight) {
         this.speciesWeight = speciesWeight;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

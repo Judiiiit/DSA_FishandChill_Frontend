@@ -6,6 +6,7 @@ import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.Models.Group;
 import com.example.android_proyecto.Models.QuestionRequest;
+import com.example.android_proyecto.Models.SellCapturedFish;
 import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserLogIn;
@@ -22,6 +23,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+
+
 
 public interface ApiService {
 
@@ -71,6 +74,12 @@ public interface ApiService {
     Call<ResponseBody> buyRod(
             @Header("Authorization") String token,
             @Path("fishing_rod_name") String rodName
+    );
+
+    @POST("shop/captured_fishes/sell")
+    Call<ResponseBody> sellCapturedFish(
+            @Header("Authorization") String token,
+            @Body SellCapturedFish body
     );
 
     // --- GAME ---

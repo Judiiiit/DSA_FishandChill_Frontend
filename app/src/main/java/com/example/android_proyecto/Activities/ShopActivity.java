@@ -20,6 +20,7 @@ import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
 import com.example.android_proyecto.Adapters.CapturedFishAdapter;
 import com.example.android_proyecto.Models.CapturedFish;
+import com.example.android_proyecto.Models.SellCapturedFish;
 
 import java.sql.Timestamp;
 
@@ -35,13 +36,17 @@ import retrofit2.Response;
 
 public class ShopActivity extends AppCompatActivity {
 
+    // UI
     private TextView tvCoins, tvInitialMessage;
     private RecyclerView rvRods, rvFishes;
     private ProgressBar progress;
     private Button btnBack, btnRods, btnInventory, btnFishes;
 
-    private RodsAdapter adapter;
+    // Adapters
+    private RodsAdapter rodsAdapter;
     private CapturedFishAdapter fishesAdapter;
+
+    // Services
     private ApiService api;
     private SessionManager session;
     private String token;
@@ -49,8 +54,8 @@ public class ShopActivity extends AppCompatActivity {
     // LOCAL DATA STORAGE
     private List<FishingRod> allRodsList = new ArrayList<>();
     private Set<String> ownedRodNames = new HashSet<>();
-    private final Set<String> soldFishKeys = new HashSet<>();
-    private List<CapturedFish> myFishes = new ArrayList<>();
+    private final Set<String> sellingFishKeys = new HashSet<>();
+
 
 
     @Override
@@ -75,21 +80,11 @@ public class ShopActivity extends AppCompatActivity {
         token = session.getToken(); // Only using session to get the token
 
         // Init Adapter
-        adapter = new RodsAdapter(this::buyRod);
+        rodsAdapter = new RodsAdapter(this::buyRod);
         rvRods.setLayoutManager(new GridLayoutManager(this, 2));
-        rvRods.setAdapter(adapter);
+        rvRods.setAdapter(rodsAdapter);
 
-        fishesAdapter = new CapturedFishAdapter((capturedFish, coinsGained) -> {
-            // 1) Sum coins locally in UI (backend not modified) ------------------------------------- SE TENDRÁ Q MODIFICAR PARA Q SE ACTUALICE EN LE BACKEND
-            int current = extractCoins(tvCoins.getText().toString());
-            tvCoins.setText("Coins: " + (current + coinsGained));
-
-            // 2) Mark fish as sold so button becomes a tick + disabled
-            soldFishKeys.add(buildFishKey(capturedFish));
-            fishesAdapter.setSoldFishKeys(soldFishKeys);
-
-            Toast.makeText(ShopActivity.this, "Sold! +" + coinsGained + " coins", Toast.LENGTH_SHORT).show();
-        });
+        fishesAdapter = new CapturedFishAdapter((capturedFish, coinsGained) -> sellFishToBackend(capturedFish, coinsGained));
         rvFishes.setLayoutManager(new GridLayoutManager(this, 2));
         rvFishes.setAdapter(fishesAdapter);
 
@@ -101,6 +96,8 @@ public class ShopActivity extends AppCompatActivity {
 
         // Show Inventory (Owned Rods)
         btnInventory.setOnClickListener(v -> showInventoryView());
+
+        // Show Fishes captured to sell
         btnFishes.setOnClickListener(v -> showFishesView());
 
         // Initial Load
@@ -177,6 +174,7 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<FishingRod>> call, Throwable t) {
                 progress.setVisibility(View.GONE);
+                showInitialMessage();
             }
         });
     }
@@ -198,9 +196,9 @@ public class ShopActivity extends AppCompatActivity {
         hideAllContent();
         rvRods.setVisibility(View.VISIBLE);
         // Pass "All Rods" to adapter
-        adapter.setInventoryMode(false); // Enable buy buttons
-        adapter.setOwnedRodNames(ownedRodNames); // Tell adapter what we own (to grey them out)
-        adapter.setRods(allRodsList);
+        rodsAdapter.setInventoryMode(false); // Enable buy buttons
+        rodsAdapter.setOwnedRodNames(ownedRodNames); // Tell adapter what we own (to grey them out)
+        rodsAdapter.setRods(allRodsList);
     }
 
     private void showInventoryView() {
@@ -215,8 +213,8 @@ public class ShopActivity extends AppCompatActivity {
         }
 
         // Pass only owned rods to adapter
-        adapter.setInventoryMode(true); // Hide buy buttons
-        adapter.setRods(myInventory);
+        rodsAdapter.setInventoryMode(true); // Hide buy buttons
+        rodsAdapter.setRods(myInventory);
     }
 
     private void showFishesView() {
@@ -226,10 +224,13 @@ public class ShopActivity extends AppCompatActivity {
     }
 
 
-    // --- FISHES LOAD ---
+    // ---------------- FISHES LOAD ----------------
 
     private void loadMyFishes() {
-        if (token == null) return;
+        if (token == null) {
+            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         progress.setVisibility(View.VISIBLE);
 
@@ -239,22 +240,23 @@ public class ShopActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    myFishes = response.body();
-                    fishesAdapter.setFishes(myFishes);
-                    fishesAdapter.setSoldFishKeys(soldFishKeys);
+                    fishesAdapter.setFishes(response.body());
 
-                    if (myFishes.isEmpty()) {
+                    // optional: show tick/disable for currently selling ones
+                    fishesAdapter.setSoldFishKeys(sellingFishKeys);
+
+                    if (response.body().isEmpty()) {
                         Toast.makeText(ShopActivity.this, "No fishes captured", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(ShopActivity.this, "Error loading fishes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ShopActivity.this, "Error loading fishes (" + response.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<CapturedFish>> call, Throwable t) {
                 progress.setVisibility(View.GONE);
-                Toast.makeText(ShopActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShopActivity.this, "Network error loading fishes", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -276,7 +278,7 @@ public class ShopActivity extends AppCompatActivity {
                     ownedRodNames.add(rod.getName());
 
                     // 2. Refresh Adapter (It will see the new name in the Set and disable the button)
-                    adapter.setOwnedRodNames(ownedRodNames);
+                    rodsAdapter.setOwnedRodNames(ownedRodNames);
 
                     // 3. Update Balance (Optional: could assume price and subtract locally, but safer to fetch)
                     updateBalance();
@@ -306,17 +308,76 @@ public class ShopActivity extends AppCompatActivity {
         });
     }
 
+    // --- SELL FISH  ---
+
+    private void sellFishToBackend(CapturedFish cf, int price) {
+        if (token == null) {
+            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (cf == null || cf.getSpeciesFish() == null || cf.getSpeciesFish().getSpeciesName() == null) {
+            Toast.makeText(this, "Fish data missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (cf.getCaptureTime() == null) {
+            Toast.makeText(this, "Capture time missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String key = buildFishKey(cf);
+        if (sellingFishKeys.contains(key)) {
+            return;
+        }
+
+        sellingFishKeys.add(key);
+        fishesAdapter.setSoldFishKeys(sellingFishKeys);
+
+        progress.setVisibility(View.VISIBLE);
+
+        String fishSpeciesName = cf.getSpeciesFish().getSpeciesName();
+        double weight = cf.getWeight();
+        String captureTime = cf.getCaptureTime().toString();
+
+        SellCapturedFish req = new SellCapturedFish(fishSpeciesName, weight, captureTime, price);
+
+        api.sellCapturedFish(token, req).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                progress.setVisibility(View.GONE);
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(ShopActivity.this, "Sold! +" + price + " coins", Toast.LENGTH_SHORT).show();
+
+                    // Refresh real coins from backend
+                    updateBalance();
+
+                    // Reload fishes list: sold fish should disappear (backend removed it)
+                    loadMyFishes();
+
+                } else {
+                    // revert "selling" state
+                    sellingFishKeys.remove(key);
+                    fishesAdapter.setSoldFishKeys(sellingFishKeys);
+
+                    Toast.makeText(ShopActivity.this, "Could not sell (" + response.code() + ")", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+
+                // revert "selling" state
+                sellingFishKeys.remove(key);
+                fishesAdapter.setSoldFishKeys(sellingFishKeys);
+
+                Toast.makeText(ShopActivity.this, "Network error selling fish", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     // --- HELPERS ---
-
-    private int extractCoins(String text) {
-        try {
-            String digits = text.replaceAll("[^0-9]", "");
-            return digits.isEmpty() ? 0 : Integer.parseInt(digits);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
 
     private String buildFishKey(CapturedFish cf) {
         String name = "Unknown";

@@ -57,12 +57,12 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
     @Override
     public void onBindViewHolder(@NonNull FishViewHolder holder, int position) {
         CapturedFish cf = fishes.get(position);
-        Fish fish = (cf != null) ? cf.getSpeciesFish() : null;
+        Fish fish = (cf != null) ? cf.getFishSpecies() : null;
 
         String name = (fish != null && fish.getSpeciesName() != null) ? fish.getSpeciesName() : "Unknown";
         int rarity = (fish != null) ? fish.getRarity() : 1; // 1/2/3
         double weight = (cf != null) ? cf.getWeight() : 0.0;
-        Timestamp ts = (cf != null) ? cf.getCaptureTime() : null;
+        String captureTime = (cf != null) ? cf.getCaptureTime() : null;
 
         int coins = FishSellCalculator.calculateCoins(weight, rarity);
 
@@ -70,7 +70,7 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
         holder.tvFishValue.setText("Value: " + coins);
 
         holder.tvFishDesc.setText(
-                "Weight: " + String.format("%.2f", weight) + " kg\n" + "Rarity: " + rarityToLabel(rarity) + "\n" + "Caught: " + formatDate(ts)
+                "Weight: " + String.format("%.2f", weight) + " kg\n" + "Rarity: " + rarityToLabel(rarity) + "\n" + "Caught: " + formatDate(captureTime)
         );
 
         // Image (igual que rods)
@@ -83,7 +83,7 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
         }
 
         // Sell button logic (mismo estilo que rods)
-        String key = buildKey(name, weight, ts);
+        String key = buildKey(name, weight, captureTime);
         boolean isSold = soldFishKeys.contains(key);
 
         if (isSold) {
@@ -132,14 +132,14 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
     }
 
     /** Timestamp -> "YYYY-MM-DD" */
-    private String formatDate(Timestamp ts) {
-        if (ts == null) return "-";
-        String s = ts.toString(); // "2025-12-24 12:34:56.0"
-        return s.length() >= 10 ? s.substring(0, 10) : s;
+    private String formatDate(String t) {
+        if (t == null) return "-";
+        return t.replace("T", " ").replace("Z", "");
     }
 
-    private String buildKey(String name, double weight, Timestamp ts) {
-        String time = (ts != null) ? ts.toString() : "-";
-        return name + "|" + String.format("%.4f", weight) + "|" + time;
+
+    private String buildKey(String name, double weight, String captureTime) {
+        if (captureTime == null) captureTime = "-";
+        return name + "|" + weight + "|" + captureTime;
     }
 }

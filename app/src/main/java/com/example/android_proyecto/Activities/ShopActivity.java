@@ -22,8 +22,6 @@ import com.example.android_proyecto.Adapters.CapturedFishAdapter;
 import com.example.android_proyecto.Models.CapturedFish;
 import com.example.android_proyecto.Models.SellCapturedFish;
 
-import java.sql.Timestamp;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -54,8 +52,6 @@ public class ShopActivity extends AppCompatActivity {
     // LOCAL DATA STORAGE
     private List<FishingRod> allRodsList = new ArrayList<>();
     private Set<String> ownedRodNames = new HashSet<>();
-    private final Set<String> sellingFishKeys = new HashSet<>();
-
 
 
     @Override
@@ -227,12 +223,10 @@ public class ShopActivity extends AppCompatActivity {
     // ---------------- FISHES LOAD ----------------
 
     private void loadMyFishes() {
-        if (token == null) {
-            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         progress.setVisibility(View.VISIBLE);
+        tvInitialMessage.setVisibility(View.GONE);
+        rvRods.setVisibility(View.GONE);
+        rvFishes.setVisibility(View.GONE);
 
         api.getMyCapturedFishes(token).enqueue(new Callback<List<CapturedFish>>() {
             @Override
@@ -240,23 +234,26 @@ public class ShopActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    fishesAdapter.setFishes(response.body());
+                    List<CapturedFish> fishes = response.body();
 
-                    // optional: show tick/disable for currently selling ones
-                    fishesAdapter.setSoldFishKeys(sellingFishKeys);
-
-                    if (response.body().isEmpty()) {
-                        Toast.makeText(ShopActivity.this, "No fishes captured", Toast.LENGTH_SHORT).show();
+                    if (fishes.isEmpty()) {
+                        tvInitialMessage.setVisibility(View.VISIBLE);
+                        tvInitialMessage.setText("No fishes to sell.");
+                    } else {
+                        rvFishes.setVisibility(View.VISIBLE);
+                        fishesAdapter.setFishes(fishes);
                     }
                 } else {
-                    Toast.makeText(ShopActivity.this, "Error loading fishes (" + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    tvInitialMessage.setVisibility(View.VISIBLE);
+                    tvInitialMessage.setText("Error loading fishes.");
                 }
             }
 
             @Override
             public void onFailure(Call<List<CapturedFish>> call, Throwable t) {
                 progress.setVisibility(View.GONE);
-                Toast.makeText(ShopActivity.this, "Network error loading fishes", Toast.LENGTH_SHORT).show();
+                tvInitialMessage.setVisibility(View.VISIBLE);
+                tvInitialMessage.setText("Network error.");
             }
         });
     }
@@ -309,36 +306,26 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     // --- SELL FISH  ---
-
     private void sellFishToBackend(CapturedFish cf, int price) {
-        if (token == null) {
-            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (cf == null || cf.getSpeciesFish() == null || cf.getSpeciesFish().getSpeciesName() == null) {
+
+        if (cf == null || cf.getFishSpecies() == null || cf.getFishSpecies().getSpeciesName() == null) {
             Toast.makeText(this, "Fish data missing", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (cf.getCaptureTime() == null) {
-            Toast.makeText(this, "Capture time missing", Toast.LENGTH_SHORT).show();
+
+        String fishSpeciesName = cf.getFishSpecies().getSpeciesName();
+
+        // Nos llega ahora como: "2025-12-23 17:11:37.0" y lo convertimos al ISO que pide Swagger
+        String captureTimeIso = toIsoZulu(cf.getCaptureTime());
+
+        if (captureTimeIso == null) {
+            Toast.makeText(this, "Invalid captureTime", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String key = buildFishKey(cf);
-        if (sellingFishKeys.contains(key)) {
-            return;
-        }
-
-        sellingFishKeys.add(key);
-        fishesAdapter.setSoldFishKeys(sellingFishKeys);
+        SellCapturedFish req = new SellCapturedFish(fishSpeciesName, captureTimeIso, price);
 
         progress.setVisibility(View.VISIBLE);
-
-        String fishSpeciesName = cf.getSpeciesFish().getSpeciesName();
-        double weight = cf.getWeight();
-        String captureTime = cf.getCaptureTime().toString();
-
-        SellCapturedFish req = new SellCapturedFish(fishSpeciesName, weight, captureTime, price);
 
         api.sellCapturedFish(token, req).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -346,32 +333,18 @@ public class ShopActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(ShopActivity.this, "Sold! +" + price + " coins", Toast.LENGTH_SHORT).show();
-
-                    // Refresh real coins from backend
+                    Toast.makeText(ShopActivity.this, "Sold! +" + price, Toast.LENGTH_SHORT).show();
                     updateBalance();
-
-                    // Reload fishes list: sold fish should disappear (backend removed it)
-                    loadMyFishes();
-
+                    loadMyFishes(); // recargar lista
                 } else {
-                    // revert "selling" state
-                    sellingFishKeys.remove(key);
-                    fishesAdapter.setSoldFishKeys(sellingFishKeys);
-
-                    Toast.makeText(ShopActivity.this, "Could not sell (" + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ShopActivity.this, "Sell failed (" + response.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progress.setVisibility(View.GONE);
-
-                // revert "selling" state
-                sellingFishKeys.remove(key);
-                fishesAdapter.setSoldFishKeys(sellingFishKeys);
-
-                Toast.makeText(ShopActivity.this, "Network error selling fish", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShopActivity.this, "Network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -379,19 +352,23 @@ public class ShopActivity extends AppCompatActivity {
 
     // --- HELPERS ---
 
-    private String buildFishKey(CapturedFish cf) {
-        String name = "Unknown";
-        if (cf != null && cf.getSpeciesFish() != null && cf.getSpeciesFish().getSpeciesName() != null) {
-            name = cf.getSpeciesFish().getSpeciesName();
+    private String toIsoZulu(String raw) {
+        if (raw == null) return null;
+
+        raw = raw.trim();
+
+        // Ya viene en ISO con Z (tu caso)
+        if (raw.contains("T") && raw.endsWith("Z")) {
+            // Si no tiene milisegundos, se los añadimos
+            if (!raw.matches(".*\\.\\d{3}Z$")) {
+                raw = raw.replace("Z", ".000Z");
+            }
+            return raw;
         }
 
-        double weight = (cf != null) ? cf.getWeight() : 0.0;
-
-        Timestamp ts = (cf != null) ? cf.getCaptureTime() : null;
-        String time = (ts != null) ? ts.toString() : "-";
-
-        return name + "|" + String.format("%.4f", weight) + "|" + time;
+        return null;
     }
+
 
 
 }

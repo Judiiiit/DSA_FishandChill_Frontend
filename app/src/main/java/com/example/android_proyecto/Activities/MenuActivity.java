@@ -36,6 +36,8 @@ public class MenuActivity extends AppCompatActivity {
     private Button btnBackFromSettings;
     private Button btnEventUsers;
 
+    private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
+
     private TextView tvWelcomeUser;
     private SessionManager session;
 
@@ -61,6 +63,11 @@ public class MenuActivity extends AppCompatActivity {
         settingsPanel = findViewById(R.id.settingsPanel);
         btnBackFromSettings = findViewById(R.id.btnBackFromSettings);
         tvWelcomeUser = findViewById(R.id.tvWelcomeUser);
+
+        tvProfileUsername = findViewById(R.id.tvProfileUsername);
+        tvProfileEmail = findViewById(R.id.tvProfileEmail);
+        tvProfileCoins = findViewById(R.id.tvProfileCoins);
+        tvProfilePassword = findViewById(R.id.tvProfilePassword);
 
         btnEventUsers = findViewById(R.id.btnEventUsers);
 
@@ -140,6 +147,7 @@ public class MenuActivity extends AppCompatActivity {
         settingsPanel.setVisibility(View.VISIBLE);
         btnBackFromSettings.setVisibility(View.VISIBLE);
         btnSettings.setVisibility(View.GONE);
+        loadProfile();
     }
 
     private void closeSettings() {
@@ -147,6 +155,47 @@ public class MenuActivity extends AppCompatActivity {
         settingsPanel.setVisibility(View.GONE);
         btnBackFromSettings.setVisibility(View.GONE);
         btnSettings.setVisibility(View.VISIBLE);
+    }
+
+    private void loadProfile() {
+        String token = session.getToken();
+
+        // Valores iniciales
+        String localUsername = session.getUsername();
+        tvProfileUsername.setText("Username: " + (localUsername != null ? localUsername : "-"));
+        tvProfileEmail.setText("Email: (cargando...)");
+        tvProfileCoins.setText("Coins: (cargando...)");
+        tvProfilePassword.setText("Password: ********");
+
+        if (token == null) {
+            tvProfileEmail.setText("Email: -");
+            tvProfileCoins.setText("Coins: -");
+            return;
+        }
+
+        api.getProfile(token).enqueue(new retrofit2.Callback<com.example.android_proyecto.Models.User>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.android_proyecto.Models.User> call,
+                                   retrofit2.Response<com.example.android_proyecto.Models.User> response) {
+
+                if (response.isSuccessful() && response.body() != null) {
+                    com.example.android_proyecto.Models.User u = response.body();
+
+                    tvProfileUsername.setText("Username: " + (u.getUsername() != null ? u.getUsername() : "-"));
+                    tvProfileEmail.setText("Email: " + (u.getEmail() != null ? u.getEmail() : "-"));
+                    tvProfileCoins.setText("Coins: " + u.getCoins());
+                } else {
+                    tvProfileEmail.setText("Email: (error " + response.code() + ")");
+                    tvProfileCoins.setText("Coins: -");
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.example.android_proyecto.Models.User> call, Throwable t) {
+                tvProfileEmail.setText("Email: (error conexión)");
+                tvProfileCoins.setText("Coins: -");
+            }
+        });
     }
 
     private void doLogout() {

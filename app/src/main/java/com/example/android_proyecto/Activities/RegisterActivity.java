@@ -48,6 +48,22 @@ public class RegisterActivity extends AppCompatActivity {
         api = RetrofitClient.getApiService();
         btnBack = findViewById(R.id.btnBack);
 
+        EditText etPasswordReg = findViewById(R.id.etPassReg);
+        TextView tvPasswordRequirements = findViewById(R.id.tvPasswordRequirements);
+
+        updatePasswordRequirements(tvPasswordRequirements, "");
+
+        etPasswordReg.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                updatePasswordRequirements(tvPasswordRequirements, s.toString());
+            }
+        });
+
+
         session = new SessionManager(this);
 
         btnRegister.setOnClickListener(v -> doRegister());
@@ -81,6 +97,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (password.length() < 6) {
             tvMsg.setText("Password must be at least 6 characters");
+            return;
+        }
+
+        String passwordError = getPasswordValidationError(password);
+        if (passwordError != null) {
+            tvMsg.setText(passwordError);
             return;
         }
 
@@ -121,4 +143,78 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
+    private String getPasswordValidationError(String password) {
+        if (password == null) return "La contraseña es obligatoria";
+
+        if (password.length() < 6) {
+            return "La contraseña debe tener al menos 6 caracteres";
+        }
+        // Al menos 1 letra (incluye acentos/ñ, etc.)
+        if (!password.matches(".*\\p{L}.*")) {
+            return "La contraseña debe contener al menos 1 letra";
+        }
+        // Al menos 1 número
+        if (!password.matches(".*\\p{N}.*")) {
+            return "La contraseña debe contener al menos 1 numero";
+        }
+        // Al menos 1 carácter especial (no cuenta espacios)
+        if (!password.matches(".*[^\\p{L}\\p{N}\\s].*")) {
+            return "La contraseña debe contener al menos 1 caracter especial";
+        }
+
+        return null;
+    }
+
+    private void updatePasswordRequirements(TextView tv, String password) {
+        boolean okLen = password != null && password.length() >= 6;
+        boolean okLetter = password != null && password.matches(".*\\p{L}.*");
+        boolean okNumber = password != null && password.matches(".*\\p{N}.*");
+        boolean okSpecial = password != null && password.matches(".*[^\\p{L}\\p{N}\\s].*");
+
+        int green = androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_green_light);
+        int red = androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_light);
+
+        // Texto compacto en 1 línea (cambia colores por segmento)
+        String prefix = "Requisitos: ";
+        String sLen = "6+";
+        String sep1 = " | ";
+        String sLetter = "letra";
+        String sep2 = " | ";
+        String sNumber = "numero";
+        String sep3 = " | ";
+        String sSpecial = "especial";
+
+        String full = prefix + sLen + sep1 + sLetter + sep2 + sNumber + sep3 + sSpecial;
+
+        android.text.SpannableString span = new android.text.SpannableString(full);
+
+        int startLen = prefix.length();
+        int endLen = startLen + sLen.length();
+
+        int startLetter = endLen + sep1.length();
+        int endLetter = startLetter + sLetter.length();
+
+        int startNumber = endLetter + sep2.length();
+        int endNumber = startNumber + sNumber.length();
+
+        int startSpecial = endNumber + sep3.length();
+        int endSpecial = startSpecial + sSpecial.length();
+
+        span.setSpan(new android.text.style.ForegroundColorSpan(okLen ? green : red),
+                startLen, endLen, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        span.setSpan(new android.text.style.ForegroundColorSpan(okLetter ? green : red),
+                startLetter, endLetter, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        span.setSpan(new android.text.style.ForegroundColorSpan(okNumber ? green : red),
+                startNumber, endNumber, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        span.setSpan(new android.text.style.ForegroundColorSpan(okSpecial ? green : red),
+                startSpecial, endSpecial, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        tv.setText(span);
+    }
+
+
 }

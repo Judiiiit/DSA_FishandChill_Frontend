@@ -83,6 +83,19 @@
                 android:padding="6dp"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/tvPasswordRequirements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/pixel_font"
+                android:textColor="@android:color/white"
+                android:textSize="9sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:alpha="0.9"
+                android:text="Requisitos:" />
+
             <ProgressBar
                 android:id="@+id/progressRegister"
                 style="?android:attr/progressBarStyleSmall"

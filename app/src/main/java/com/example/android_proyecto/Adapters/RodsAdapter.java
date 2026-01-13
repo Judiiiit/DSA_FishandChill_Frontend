@@ -1,7 +1,11 @@
 package com.example.android_proyecto.Adapters;
 
+import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +28,6 @@ import java.util.Set;
 
 public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder> {
 
-    // Helper interface to distinguish actions
     public interface OnRodActionListener {
         void onBuyClick(FishingRod rod);
         void onEquipClick(FishingRod rod);
@@ -32,8 +35,8 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
 
     private List<FishingRod> rods = new ArrayList<>();
     private Set<String> ownedRodNames = new HashSet<>();
-    private String equippedRodName = ""; // Stores the name of the currently equipped rod
-    private OnRodActionListener listener;
+    private String equippedRodName = "";
+    private final OnRodActionListener listener;
 
     public RodsAdapter(OnRodActionListener listener) {
         this.listener = listener;
@@ -65,93 +68,155 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
     public void onBindViewHolder(@NonNull RodViewHolder holder, int position) {
         FishingRod rod = rods.get(position);
 
-        // 1. Basic Info
+        // --- 1. Basic Info ---
         holder.tvName.setText(rod.getName());
-        String stats = "Power: " + rod.getPower() + "\nSpeed: " + rod.getSpeed() + "\nDurability: " + rod.getDurability();
+        String stats = "Power: " + rod.getPower() +
+                "\nSpeed: " + String.format("%.1f", rod.getSpeed()) +
+                "\nDurab.: " + rod.getDurability();
         holder.tvStats.setText(stats);
 
         Glide.with(holder.itemView.getContext())
                 .load(RetrofitClient.SERVER_URL + rod.getUrl())
                 .into(holder.imgRod);
 
-        // 2. Logic: Buy vs Equip vs Equipped
+        // --- 2. Button Logic with Custom Styling ---
         boolean isOwned = ownedRodNames.contains(rod.getName());
         boolean isEquipped = rod.getName().equals(equippedRodName);
 
         if (isOwned) {
-            holder.tvPrice.setVisibility(View.GONE); // Hide price if owned
-
+            holder.tvPrice.setVisibility(View.GONE);
             if (isEquipped) {
-                // STATE: EQUIPPED
                 holder.btnAction.setText("Equipped");
                 holder.btnAction.setEnabled(false);
-                holder.btnAction.setBackgroundColor(Color.parseColor("#44FFFFFF")); // Transparent/Disabled look
+                // Style: Transparent Gray
+                styleButton(holder.btnAction, Color.parseColor("#44FFFFFF"), Color.parseColor("#66FFFFFF"));
             } else {
-                // STATE: OWNED BUT NOT EQUIPPED
                 holder.btnAction.setText("Equip");
                 holder.btnAction.setEnabled(true);
-                holder.btnAction.setBackgroundColor(Color.parseColor("#2a9d6f")); // Greenish equip color
+                // Style: Green #2a9d6f
+                styleButton(holder.btnAction, Color.parseColor("#2a9d6f"), darkenColor(Color.parseColor("#2a9d6f")));
                 holder.btnAction.setOnClickListener(v -> listener.onEquipClick(rod));
             }
         } else {
-            // STATE: NOT OWNED (BUY)
             holder.tvPrice.setVisibility(View.VISIBLE);
             holder.tvPrice.setText("💰 " + rod.getPrice());
-
             holder.btnAction.setText("Buy");
             holder.btnAction.setEnabled(true);
-            holder.btnAction.setBackgroundColor(Color.parseColor("#2a86c7")); // Blue buy color
+            // Style: Blue #2a86c7
+            styleButton(holder.btnAction, Color.parseColor("#2a86c7"), darkenColor(Color.parseColor("#2a86c7")));
             holder.btnAction.setOnClickListener(v -> listener.onBuyClick(rod));
         }
 
-        // 3. Rarity Styling (Colors from HTML)
-        applyRarityStyling(holder, rod.getRarity() + "");
+        // --- 3. Rarity Visuals ---
+        applyRarityVisuals(holder, rod.getRarity() + "");
     }
 
-    private void applyRarityStyling(RodViewHolder holder, String rarityStr) {
-        // Parse rarity, default to 1 if not a number
-        int rarity = 1;
+    private void styleButton(Button btn, int bgColor, int strokeColor) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setColor(bgColor);
+        drawable.setCornerRadius(10 * btn.getContext().getResources().getDisplayMetrics().density);
+        drawable.setStroke((int) (2 * btn.getContext().getResources().getDisplayMetrics().density), strokeColor);
+        btn.setBackground(drawable);
+    }
+
+    private int darkenColor(int color) {
+        float factor = 0.7f;
+        int a = Color.alpha(color);
+        int r = Math.round(Color.red(color) * factor);
+        int g = Math.round(Color.green(color) * factor);
+        int b = Math.round(Color.blue(color) * factor);
+        return Color.argb(a, Math.min(r, 255), Math.min(g, 255), Math.min(b, 255));
+    }
+
+    private void applyRarityVisuals(RodViewHolder holder, String rarityStr) {
+        int rarity;
         try {
             rarity = Integer.parseInt(rarityStr);
         } catch (NumberFormatException e) {
             rarity = 1;
         }
 
-        String glowColor;
-        String bgColor; // Background for the right info panel
-
-        switch (rarity) {
-            case 2: // Rare
-                glowColor = "#3b82f6"; // Blue
-                bgColor = "#203b82f6";
-                break;
-            case 3: // Epic
-                glowColor = "#a855f7"; // Purple
-                bgColor = "#20a855f7";
-                break;
-            case 4: // Legendary
-                glowColor = "#ef4444"; // Red
-                bgColor = "#30ef4444";
-                break;
-            case 5: // Mythic/Special
-                glowColor = "#FFFFFF"; // White
-                bgColor = "#20FFFFFF";
-                break;
-            default: // Common (1)
-                glowColor = "#3bd671"; // Green
-                bgColor = "#203bd671";
-                break;
+        if (holder.rainbowAnimator != null) {
+            holder.rainbowAnimator.cancel();
+            holder.rainbowAnimator = null;
         }
 
-        holder.tvName.setTextColor(Color.parseColor(glowColor));
-        holder.tvName.setShadowLayer(12, 0, 0, Color.parseColor(glowColor));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            holder.containerRight.setRenderEffect(RenderEffect.createBlurEffect(2.0f, 2.0f, Shader.TileMode.CLAMP));
+        }
 
-        // Apply background tint to the right container
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(Color.parseColor(bgColor));
-        bg.setCornerRadius(12);
-        bg.setStroke(2, Color.parseColor(glowColor)); // Add border based on rarity
-        holder.containerRight.setBackground(bg);
+        if (rarity == 5) {
+            applyRainbowAnimation(holder);
+        } else {
+            int baseColor;
+            switch (rarity) {
+                case 2: baseColor = Color.parseColor("#3b82f6"); break; // Blue
+                case 3: baseColor = Color.parseColor("#a855f7"); break; // Purple
+                // CHANGED: Lighter Red (#ff7f7f) instead of Dark Red (#ef4444)
+                case 4: baseColor = Color.parseColor("#ff7f7f"); break;
+                default: baseColor = Color.parseColor("#3bd671"); break; // Green (1)
+            }
+
+            holder.tvName.setTextColor(baseColor);
+            holder.tvName.setShadowLayer(15, 0, 0, baseColor);
+
+            GradientDrawable imgBg = new GradientDrawable();
+            imgBg.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+            imgBg.setGradientRadius(200f);
+            int c1 = setAlpha(baseColor, 150);
+            int c2 = setAlpha(baseColor, 60);
+            int c3 = Color.TRANSPARENT;
+            imgBg.setColors(new int[]{c1, c2, c3});
+            holder.imgRod.setBackground(imgBg);
+
+            GradientDrawable infoBg = new GradientDrawable();
+            infoBg.setColor(setAlpha(baseColor, 30));
+            infoBg.setCornerRadius(12 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
+            infoBg.setStroke(2, setAlpha(baseColor, 80));
+            holder.containerRight.setBackground(infoBg);
+        }
+    }
+
+    private void applyRainbowAnimation(RodViewHolder holder) {
+        int[] rainbowColors = {
+                Color.parseColor("#ff6464"), Color.parseColor("#ffc864"),
+                Color.parseColor("#c8ff64"), Color.parseColor("#64ffc8"),
+                Color.parseColor("#64c8ff"), Color.parseColor("#c864ff"),
+                Color.parseColor("#ff6464")
+        };
+
+        ValueAnimator animator = ValueAnimator.ofArgb(rainbowColors);
+        animator.setDuration(3000);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.addUpdateListener(animation -> {
+            int animatedColor = (int) animation.getAnimatedValue();
+
+            holder.tvName.setTextColor(animatedColor);
+            holder.tvName.setShadowLayer(20, 0, 0, Color.WHITE);
+
+            GradientDrawable imgBg = new GradientDrawable();
+            imgBg.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+            imgBg.setGradientRadius(200f);
+            int c1 = setAlpha(animatedColor, 150);
+            int c2 = setAlpha(animatedColor, 60);
+            int c3 = Color.TRANSPARENT;
+            imgBg.setColors(new int[]{c1, c2, c3});
+            holder.imgRod.setBackground(imgBg);
+
+            GradientDrawable infoBg = new GradientDrawable();
+            infoBg.setColor(setAlpha(animatedColor, 20));
+            infoBg.setCornerRadius(12 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
+            infoBg.setStroke(3, setAlpha(animatedColor, 120));
+            holder.containerRight.setBackground(infoBg);
+        });
+
+        animator.start();
+        holder.rainbowAnimator = animator;
+    }
+
+    private int setAlpha(int color, int alpha) {
+        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
     }
 
     @Override
@@ -163,7 +228,8 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
         TextView tvName, tvStats, tvPrice;
         Button btnAction;
         ImageView imgRod;
-        View containerRight; // Reference to the right side for styling
+        View containerRight;
+        ValueAnimator rainbowAnimator;
 
         RodViewHolder(@NonNull View itemView) {
             super(itemView);

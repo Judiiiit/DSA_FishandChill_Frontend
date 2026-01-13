@@ -36,7 +36,7 @@ import retrofit2.Response;
 public class ShopActivity extends AppCompatActivity {
 
     // UI
-    private TextView tvCoins, tvInitialMessage;
+    private TextView tvCoins, tvTotalFishes, tvInitialMessage;
     private RecyclerView rvRods, rvFishes;
     private ProgressBar progress;
     private Button btnBack, btnRods, btnInventory, btnFishes;
@@ -50,10 +50,17 @@ public class ShopActivity extends AppCompatActivity {
     private SessionManager session;
     private String token;
 
+
     // LOCAL DATA STORAGE
     private List<FishingRod> allRodsList = new ArrayList<>();
     private Set<String> ownedRodNames = new HashSet<>();
     private String currentEquippedRod = ""; // New: Track equipped rod
+
+
+    private static final String PREF_NAME = "session_prefs"; // mismo nombre que SessionManager
+    private static final String KEY_FISH_TOTAL_PREFIX = "fish_total_";
+    private static final String KEY_FISH_SEEN_PREFIX  = "fish_seen_";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +69,8 @@ public class ShopActivity extends AppCompatActivity {
 
         // Init Views
         tvCoins = findViewById(R.id.tvCoins);
+        tvTotalFishes = findViewById(R.id.tvTotalFishes);
+
         tvInitialMessage = findViewById(R.id.tvInitialMessage);
         rvRods = findViewById(R.id.rvRods);
         rvFishes = findViewById(R.id.rvFishes);
@@ -74,6 +83,8 @@ public class ShopActivity extends AppCompatActivity {
         api = RetrofitClient.getApiService();
         session = new SessionManager(this);
         token = session.getToken();
+
+        renderTotalFishes();
 
         // Init Adapter with BOTH listeners (Buy and Equip)
         rodsAdapter = new RodsAdapter(new RodsAdapter.OnRodActionListener() {
@@ -201,21 +212,29 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void loadMyFishes() {
-        // ... (Keep existing implementation) ...
-        // Just for brevity in this response, keep your existing logic here
         progress.setVisibility(View.VISIBLE);
+
         api.getMyCapturedFishes(token).enqueue(new Callback<List<CapturedFish>>() {
             @Override
             public void onResponse(Call<List<CapturedFish>> call, Response<List<CapturedFish>> response) {
                 progress.setVisibility(View.GONE);
+
                 if (response.isSuccessful() && response.body() != null) {
-                    fishesAdapter.setFishes(response.body());
+                    List<CapturedFish> fishes = response.body();
+
+                    updateTotalFishesIfNew(fishes);
+
+                    fishesAdapter.setFishes(fishes);
                 }
             }
+
             @Override
-            public void onFailure(Call<List<CapturedFish>> call, Throwable t) { progress.setVisibility(View.GONE); }
+            public void onFailure(Call<List<CapturedFish>> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+            }
         });
     }
+
 
     // --- ACTIONS ---
 
@@ -283,6 +302,160 @@ public class ShopActivity extends AppCompatActivity {
 
     // ... (Keep existing sellFishToBackend and helpers) ...
     private void sellFishToBackend(CapturedFish cf, int price) {
-        // ... Keep existing logic
+        if (token == null) {
+            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (cf == null || cf.getFishSpecies() == null || cf.getFishSpecies().getSpeciesName() == null) {
+            Toast.makeText(this, "Fish data missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (cf.getCaptureTime() == null) {
+            Toast.makeText(this, "Capture time missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String fishSpeciesName = cf.getFishSpecies().getSpeciesName();
+
+        // Tu backend puede estar esperando ISO 8601 con Z (por lo que comentas del commit bueno)
+        String captureTimeIso = toIsoZulu(cf.getCaptureTime());
+        if (captureTimeIso == null) {
+            Toast.makeText(this, "Invalid captureTime", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progress.setVisibility(View.VISIBLE);
+
+        SellCapturedFish req = new SellCapturedFish(fishSpeciesName, captureTimeIso, price);
+
+        api.sellCapturedFish(token, req).enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+            @Override
+            public void onResponse(retrofit2.Call<okhttp3.ResponseBody> call,
+                                   retrofit2.Response<okhttp3.ResponseBody> response) {
+                progress.setVisibility(View.GONE);
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(ShopActivity.this, "Sold! +" + price + " coins", Toast.LENGTH_SHORT).show();
+
+                    // En tu ZIP actual existe refreshUserData(), úsalo para recargar coins desde backend
+                    refreshUserData();
+                    loadMyFishes();
+                } else {
+                    Toast.makeText(ShopActivity.this, "Sell failed (" + response.code() + ")", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<okhttp3.ResponseBody> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+                Toast.makeText(ShopActivity.this, "Network error selling fish: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
+    private String toIsoZulu(String raw) {
+        if (raw == null) return null;
+        raw = raw.trim();
+
+        // Si ya viene como ISO con Z, asegúrate de milisegundos
+        if (raw.contains("T") && raw.endsWith("Z")) {
+            if (!raw.matches(".*\\.\\d{3}Z$")) {
+                raw = raw.replace("Z", ".000Z");
+            }
+            return raw;
+        }
+
+        // Si viene como "yyyy-MM-dd HH:mm:ss.S" / ".SSS" / sin ms
+        java.text.SimpleDateFormat[] inputs = new java.text.SimpleDateFormat[] {
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", java.util.Locale.US),
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S", java.util.Locale.US),
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US),
+        };
+
+        java.text.SimpleDateFormat output =
+                new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US);
+        output.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+
+        for (java.text.SimpleDateFormat in : inputs) {
+            in.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            try {
+                java.util.Date d = in.parse(raw);
+                if (d != null) return output.format(d);
+            } catch (java.text.ParseException ignored) {}
+        }
+
+        return null;
+    }
+
+    private void renderTotalFishes() {
+        if (tvTotalFishes == null) return;
+
+        if (session == null) {
+            session = new SessionManager(this);
+        }
+
+        String username = session.getUsername();
+        if (username == null) {
+            tvTotalFishes.setText("Fishes caught: 0");
+            return;
+        }
+
+        int total = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+                .getInt(KEY_FISH_TOTAL_PREFIX + username, 0);
+
+        tvTotalFishes.setText("Fishes caught: " + total);
+    }
+
+
+    private void updateTotalFishesIfNew(List<CapturedFish> fishes) {
+        if (tvTotalFishes == null) return;
+
+        if (session == null) {
+            session = new SessionManager(this);
+        }
+
+        String username = session.getUsername();
+        if (username == null || fishes == null) return;
+
+        var sp = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
+        // IMPORTANTE: copiar el set, porque el devuelto por SharedPreferences no conviene modificarlo directamente
+        java.util.Set<String> seen = new java.util.HashSet<>(
+                sp.getStringSet(KEY_FISH_SEEN_PREFIX + username, new java.util.HashSet<>())
+        );
+
+        int total = sp.getInt(KEY_FISH_TOTAL_PREFIX + username, 0);
+
+        boolean changed = false;
+
+        for (CapturedFish cf : fishes) {
+            String key = buildFishKeyForTotal(cf);
+            if (key != null && !seen.contains(key)) {
+                seen.add(key);
+                total++;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            sp.edit()
+                    .putStringSet(KEY_FISH_SEEN_PREFIX + username, seen)
+                    .putInt(KEY_FISH_TOTAL_PREFIX + username, total)
+                    .apply();
+        }
+
+        tvTotalFishes.setText("Total fishes caught: " + total);
+    }
+
+    private String buildFishKeyForTotal(CapturedFish cf) {
+        if (cf == null) return null;
+        if (cf.getFishSpecies() == null || cf.getFishSpecies().getSpeciesName() == null) return null;
+        if (cf.getCaptureTime() == null) return null;
+
+        // species + captureTime suele ser suficiente como identificador estable
+        return cf.getFishSpecies().getSpeciesName() + "|" + cf.getCaptureTime();
+    }
+
+
 }

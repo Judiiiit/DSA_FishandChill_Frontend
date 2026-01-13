@@ -70,17 +70,24 @@ public interface ApiService {
 
     // --- SHOP ---
 
+    @POST("shop/captured_fishes/sell")
+    Call<ResponseBody> sellCapturedFish(
+            @Header("Authorization") String token,
+            @Body SellCapturedFish body
+    );
+
     @POST("shop/fishing_rods/{fishing_rod_name}/buy")
     Call<ResponseBody> buyRod(
             @Header("Authorization") String token,
             @Path("fishing_rod_name") String rodName
     );
 
-    @POST("shop/captured_fishes/sell")
-    Call<ResponseBody> sellCapturedFish(
+    @POST("shop/fishing_rods/{fishing_rod_name}/equip")
+    Call<ResponseBody> equipRod(
             @Header("Authorization") String token,
-            @Body SellCapturedFish body
+            @Path("fishing_rod_name") String rodName
     );
+
 
     // --- GAME ---
 

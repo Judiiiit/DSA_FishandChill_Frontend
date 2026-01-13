@@ -48,6 +48,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+
     <TextView
         android:id="@+id/tvShopTitle"
         android:layout_width="wrap_content"
@@ -61,24 +62,25 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.45"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.100000024" />
-
+        app:layout_constraintVertical_bias="0.091" />
 
     <FrameLayout
         android:id="@+id/flShopContent"
-        android:layout_width="482dp"
-        android:layout_height="261dp"
+        android:layout_width="0dp"
+        android:layout_height="257dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_weight="1"
-        android:background="@drawable/bg_login_card"
+        android:background="@android:color/transparent"
         android:elevation="6dp"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.72"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnFishes"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- RODS -->
@@ -97,6 +99,7 @@
             android:padding="6dp"
             android:visibility="gone" />
 
+
         <TextView
             android:id="@+id/tvInitialMessage"
             android:layout_width="match_parent"
@@ -107,7 +110,6 @@
             android:textColor="#FFFF"
             android:textSize="18sp"
             android:textStyle="italic" />
-
 
         <ProgressBar
             android:id="@+id/progressShop"
@@ -122,12 +124,11 @@
     </FrameLayout>
 
 
-
     <Button
         android:id="@+id/btnRods"
         android:layout_width="wrap_content"
         android:layout_height="34dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="18dp"
         android:background="@drawable/pixel_button_bg_brown"
         android:fontFamily="@font/pixel_font"
         android:paddingHorizontal="12dp"
@@ -136,14 +137,17 @@
         android:textColor="@android:color/white"
         android:textSize="14sp"
         app:backgroundTint="@null"
-        app:layout_constraintBottom_toTopOf="@+id/btnInventory"
-        app:layout_constraintEnd_toStartOf="@+id/flShopContent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.45" />
 
     <Button
         android:id="@+id/btnEquipment"
         android:layout_width="wrap_content"
         android:layout_height="34dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/pixel_button_bg_brown"
         android:fontFamily="@font/pixel_font"
         android:paddingHorizontal="12dp"
@@ -157,27 +161,10 @@
         tools:visibility="invisible" />
 
     <Button
-        android:id="@+id/btnInventory"
-        android:layout_width="wrap_content"
-        android:layout_height="34dp"
-        android:background="@drawable/pixel_button_bg_brown"
-        android:fontFamily="@font/pixel_font"
-        android:paddingHorizontal="12dp"
-        android:text="Inventory"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        app:backgroundTint="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/flShopContent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/btnFishes"
         android:layout_width="wrap_content"
         android:layout_height="34dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/pixel_button_bg_brown"
         android:fontFamily="@font/pixel_font"
         android:paddingHorizontal="12dp"
@@ -187,15 +174,18 @@
         android:textSize="14sp"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/flShopContent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnInventory"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.559" />
 
     <Button
         android:id="@+id/btnSell"
         android:layout_width="wrap_content"
         android:layout_height="34dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/pixel_button_bg_brown"
         android:fontFamily="@font/pixel_font"
         android:paddingHorizontal="12dp"

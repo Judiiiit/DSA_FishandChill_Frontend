@@ -26,7 +26,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/pixel_font"
-        android:text="Leaderboard"
+        android:text="LEADERBOARD"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"

@@ -3,6 +3,7 @@ package com.example.android_proyecto.Adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,9 +36,23 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         LeaderboardEntry e = items.get(position);
-        holder.tvRank.setText("#" + (position + 1));
+
+        int rank = position + 1;
+
+        holder.tvRank.setText("#" + rank);
         holder.tvUsername.setText(e.getUsername());
         holder.tvTotal.setText(String.valueOf(e.getTotalFishes()));
+
+        // 🎖️ Fondo según posición
+        if (position == 0) {
+            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_gold);
+        } else if (position == 1) {
+            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_silver);
+        } else if (position == 2) {
+            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_bronze);
+        } else {
+            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_normal);
+        }
     }
 
     @Override
@@ -47,12 +62,14 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvRank, tvUsername, tvTotal;
+        LinearLayout containerRow;
 
         VH(@NonNull View itemView) {
             super(itemView);
             tvRank = itemView.findViewById(R.id.tvRank);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvTotal = itemView.findViewById(R.id.tvTotal);
+            containerRow = itemView.findViewById(R.id.containerRow);
         }
     }
 }

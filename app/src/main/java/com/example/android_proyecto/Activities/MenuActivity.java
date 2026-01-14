@@ -36,13 +36,12 @@ public class MenuActivity extends AppCompatActivity {
     private Button btnBackFromSettings;
     private Button btnEventUsers;
 
-    private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
+    private Button btnLeaderboard;
 
+    private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
     private TextView tvWelcomeUser;
     private SessionManager session;
-
     private ApiService api;
-
     private ActivityResultLauncher<Intent> unityLauncher;
 
     @Override
@@ -71,16 +70,15 @@ public class MenuActivity extends AppCompatActivity {
 
         btnEventUsers = findViewById(R.id.btnEventUsers);
 
+        btnLeaderboard = findViewById(R.id.btnLeaderboard);
+
         String username = session.getUsername();
         tvWelcomeUser.setText("Welcome, " + username + "!");
-
-        String token = session.getToken();
 
         unityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        // si Unity te devuelve algo
                         String unityResult = result.getData().getStringExtra("unity_result");
                         Log.d("UnityReturn", "unity_result=" + unityResult);
                         Toast.makeText(this, "Unity result: " + unityResult, Toast.LENGTH_SHORT).show();
@@ -98,7 +96,6 @@ public class MenuActivity extends AppCompatActivity {
                         "com.unity3d.player.UnityPlayerGameActivity"
                 ));
                 intent.putExtra("token", session.getToken());
-
                 unityLauncher.launch(intent);
 
             } catch (Exception e) {
@@ -121,9 +118,13 @@ public class MenuActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // ✅ AÑADIDO: listener del botón Events
         btnEventUsers.setOnClickListener(v -> {
             Intent i = new Intent(MenuActivity.this, ChooseEventSplitActivity.class);
+            startActivity(i);
+        });
+
+        btnLeaderboard.setOnClickListener(v -> {
+            Intent i = new Intent(MenuActivity.this, LeaderboardActivity.class);
             startActivity(i);
         });
 
@@ -160,7 +161,6 @@ public class MenuActivity extends AppCompatActivity {
     private void loadProfile() {
         String token = session.getToken();
 
-        // Valores iniciales
         String localUsername = session.getUsername();
         tvProfileUsername.setText("Username: " + (localUsername != null ? localUsername : "-"));
         tvProfileEmail.setText("Email: (cargando...)");

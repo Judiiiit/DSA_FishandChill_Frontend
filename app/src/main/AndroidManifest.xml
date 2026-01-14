@@ -41,6 +41,8 @@
         <activity android:name=".Activities.EventUsersActivity" />
         <activity android:name=".Activities.ChooseEventSplitActivity" />
         <activity android:name=".Activities.GroupsActivity" android:exported="false"  />
+        <activity android:name=".Activities.LeaderboardActivity" />
+
 
 
     </application>

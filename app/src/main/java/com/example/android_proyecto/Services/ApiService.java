@@ -5,6 +5,7 @@ import com.example.android_proyecto.Models.EventUser;
 import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.Models.Group;
+import com.example.android_proyecto.Models.LeaderboardEntry;
 import com.example.android_proyecto.Models.QuestionRequest;
 import com.example.android_proyecto.Models.SellCapturedFish;
 import com.example.android_proyecto.Models.Token;
@@ -23,8 +24,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
-
-
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -52,7 +52,6 @@ public interface ApiService {
 
     @DELETE("me")
     Call<ResponseBody> deleteMe(@Header("Authorization") String token);
-
 
     // --- CATALOG ---
 
@@ -88,7 +87,6 @@ public interface ApiService {
             @Path("fishing_rod_name") String rodName
     );
 
-
     // --- GAME ---
 
     @POST("game/captured")
@@ -113,7 +111,11 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("groupId") int groupId
     );
+
     // --- EVENTS ---
     @GET("events/{eventId}/users")
     Call<List<EventUser>> getEventUsers(@Path("eventId") String eventId);
+
+    @GET("leaderboard/fishes")
+    Call<List<LeaderboardEntry>> getFishLeaderboard(@Query("limit") int limit);
 }

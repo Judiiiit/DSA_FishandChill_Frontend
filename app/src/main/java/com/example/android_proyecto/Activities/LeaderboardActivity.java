@@ -2,6 +2,7 @@ package com.example.android_proyecto.Activities;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -25,6 +26,8 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private RecyclerView rvLeaderboard;
     private ProgressBar progressLeaderboard;
+    private Button btnBackLeaderboard;
+
     private LeaderboardAdapter adapter;
     private ApiService api;
 
@@ -35,13 +38,15 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         rvLeaderboard = findViewById(R.id.rvLeaderboard);
         progressLeaderboard = findViewById(R.id.progressLeaderboard);
+        btnBackLeaderboard = findViewById(R.id.btnBackLeaderboard);
+
+        btnBackLeaderboard.setOnClickListener(v -> finish());
 
         adapter = new LeaderboardAdapter();
         rvLeaderboard.setLayoutManager(new LinearLayoutManager(this));
         rvLeaderboard.setAdapter(adapter);
 
         api = RetrofitClient.getApiService();
-
         loadLeaderboard();
     }
 

@@ -3,6 +3,8 @@ package com.example.android_proyecto.Activities;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,16 +38,19 @@ public class MenuActivity extends AppCompatActivity {
     private FrameLayout settingsPanel;
     private Button btnBackFromSettings;
     private Button btnEventUsers;
-
     private Button btnLeaderboard;
-
     private Button btnDeleteAccount;
 
     private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
     private TextView tvWelcomeUser;
+
     private SessionManager session;
     private ApiService api;
     private ActivityResultLauncher<Intent> unityLauncher;
+
+    private SoundPool soundPool;
+    private int soundClick;
+    private int soundDanger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,19 @@ public class MenuActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         api = RetrofitClient.getApiService();
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(2)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        soundClick = soundPool.load(this, R.raw.ui_click, 1);
+        soundDanger = soundPool.load(this, R.raw.ui_danger, 1);
 
         btnGoGame = findViewById(R.id.btnGoGame);
         btnGoShop = findViewById(R.id.btnGoShop);
@@ -72,11 +90,8 @@ public class MenuActivity extends AppCompatActivity {
         tvProfilePassword = findViewById(R.id.tvProfilePassword);
 
         btnEventUsers = findViewById(R.id.btnEventUsers);
-
         btnLeaderboard = findViewById(R.id.btnLeaderboard);
-
         btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
-        btnDeleteAccount.setOnClickListener(v -> confirmDeleteAccount());
 
         String username = session.getUsername();
         tvWelcomeUser.setText("Welcome, " + username + "!");
@@ -88,13 +103,12 @@ public class MenuActivity extends AppCompatActivity {
                         String unityResult = result.getData().getStringExtra("unity_result");
                         Log.d("UnityReturn", "unity_result=" + unityResult);
                         Toast.makeText(this, "Unity result: " + unityResult, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("UnityReturn", "Unity cancelled or without data");
                     }
                 }
         );
 
         btnGoGame.setOnClickListener(v -> {
+            playClick();
             try {
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName(
@@ -103,43 +117,56 @@ public class MenuActivity extends AppCompatActivity {
                 ));
                 intent.putExtra("token", session.getToken());
                 unityLauncher.launch(intent);
-
             } catch (Exception e) {
-                Toast.makeText(MenuActivity.this, "Install the unity app first", Toast.LENGTH_SHORT).show();
-                Log.e("UnityLaunchError", "Error launching Unity", e);
+                Toast.makeText(this, "Install the unity app first", Toast.LENGTH_SHORT).show();
             }
         });
 
         btnGoShop.setOnClickListener(v -> {
-            Intent intent = new Intent(MenuActivity.this, ShopActivity.class);
-            startActivity(intent);
+            playClick();
+            startActivity(new Intent(this, ShopActivity.class));
         });
 
-        btnLogout.setOnClickListener(v -> doLogout());
+        btnLogout.setOnClickListener(v -> {
+            playClick();
+            doLogout();
+        });
 
-        btnSettings.setOnClickListener(v -> openSettings());
+        btnSettings.setOnClickListener(v -> {
+            playClick();
+            openSettings();
+        });
 
         btnGroups.setOnClickListener(v -> {
-            Intent intent = new Intent(MenuActivity.this, GroupsActivity.class);
-            startActivity(intent);
+            playClick();
+            startActivity(new Intent(this, GroupsActivity.class));
         });
 
         btnEventUsers.setOnClickListener(v -> {
-            Intent i = new Intent(MenuActivity.this, ChooseEventSplitActivity.class);
-            startActivity(i);
+            playClick();
+            startActivity(new Intent(this, ChooseEventSplitActivity.class));
         });
 
         btnLeaderboard.setOnClickListener(v -> {
-            Intent i = new Intent(MenuActivity.this, LeaderboardActivity.class);
-            startActivity(i);
+            playClick();
+            startActivity(new Intent(this, LeaderboardActivity.class));
         });
 
-        btnBackFromSettings.setOnClickListener(v -> closeSettings());
+        btnBackFromSettings.setOnClickListener(v -> {
+            playClick();
+            closeSettings();
+        });
+
+        btnDeleteAccount.setOnClickListener(v -> {
+            playDanger();
+            confirmDeleteAccount();
+        });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (settingsPanel != null && settingsPanel.getVisibility() == View.VISIBLE) {
+                if (settingsPanel.getVisibility() == View.VISIBLE) {
+                    playClick();
                     closeSettings();
                 } else {
                     setEnabled(false);
@@ -147,6 +174,18 @@ public class MenuActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void playClick() {
+        if (soundPool != null) {
+            soundPool.play(soundClick, 0.6f, 0.6f, 0, 0, 1f);
+        }
+    }
+
+    private void playDanger() {
+        if (soundPool != null) {
+            soundPool.play(soundDanger, 0.9f, 0.9f, 1, 0, 1f);
+        }
     }
 
     private void openSettings() {
@@ -167,38 +206,27 @@ public class MenuActivity extends AppCompatActivity {
     private void loadProfile() {
         String token = session.getToken();
 
-        String localUsername = session.getUsername();
-        tvProfileUsername.setText("Username: " + (localUsername != null ? localUsername : "-"));
+        tvProfileUsername.setText("Username: " + session.getUsername());
         tvProfileEmail.setText("Email: (cargando...)");
         tvProfileCoins.setText("Coins: (cargando...)");
         tvProfilePassword.setText("Password: ********");
 
-        if (token == null) {
-            tvProfileEmail.setText("Email: -");
-            tvProfileCoins.setText("Coins: -");
-            return;
-        }
+        if (token == null) return;
 
         api.getProfile(token).enqueue(new retrofit2.Callback<com.example.android_proyecto.Models.User>() {
             @Override
             public void onResponse(retrofit2.Call<com.example.android_proyecto.Models.User> call,
                                    retrofit2.Response<com.example.android_proyecto.Models.User> response) {
-
                 if (response.isSuccessful() && response.body() != null) {
-                    com.example.android_proyecto.Models.User u = response.body();
-
-                    tvProfileUsername.setText("Username: " + (u.getUsername() != null ? u.getUsername() : "-"));
-                    tvProfileEmail.setText("Email: " + (u.getEmail() != null ? u.getEmail() : "-"));
+                    var u = response.body();
+                    tvProfileEmail.setText("Email: " + u.getEmail());
                     tvProfileCoins.setText("Coins: " + u.getCoins());
-                } else {
-                    tvProfileEmail.setText("Email: (error " + response.code() + ")");
-                    tvProfileCoins.setText("Coins: -");
                 }
             }
 
             @Override
             public void onFailure(retrofit2.Call<com.example.android_proyecto.Models.User> call, Throwable t) {
-                tvProfileEmail.setText("Email: (error conexión)");
+                tvProfileEmail.setText("Email: -");
                 tvProfileCoins.setText("Coins: -");
             }
         });
@@ -213,19 +241,16 @@ public class MenuActivity extends AppCompatActivity {
             return;
         }
 
-        Call<ResponseBody> call = api.logout(token);
-        call.enqueue(new Callback<ResponseBody>() {
+        api.logout(token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 session.clear();
-                Toast.makeText(MenuActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
                 goToMain();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 session.clear();
-                Toast.makeText(MenuActivity.this, "Logged out (connection error: " + t.getMessage() + ")", Toast.LENGTH_SHORT).show();
                 goToMain();
             }
         });
@@ -235,8 +260,11 @@ public class MenuActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar cuenta")
                 .setMessage("Esta acción es permanente. ¿Seguro que quieres eliminar tu cuenta?")
-                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
-                .setPositiveButton("Eliminar", (dialog, which) -> doDeleteAccount())
+                .setNegativeButton("Cancelar", (d, w) -> d.dismiss())
+                .setPositiveButton("Eliminar", (d, w) -> {
+                    playDanger();
+                    doDeleteAccount();
+                })
                 .show();
     }
 
@@ -244,7 +272,6 @@ public class MenuActivity extends AppCompatActivity {
         String token = session.getToken();
 
         if (token == null) {
-            Toast.makeText(this, "No hay sesión activa", Toast.LENGTH_SHORT).show();
             session.clear();
             goToMain();
             return;
@@ -256,28 +283,30 @@ public class MenuActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 btnDeleteAccount.setEnabled(true);
-
-                if (response.isSuccessful()) {
-                    session.clear();
-                    Toast.makeText(MenuActivity.this, "Cuenta eliminada", Toast.LENGTH_SHORT).show();
-                    goToMain();
-                } else {
-                    Toast.makeText(MenuActivity.this, "No se pudo eliminar (HTTP " + response.code() + ")", Toast.LENGTH_LONG).show();
-                }
+                session.clear();
+                goToMain();
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 btnDeleteAccount.setEnabled(true);
-                Toast.makeText(MenuActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void goToMain() {
-        Intent intent = new Intent(MenuActivity.this, MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+        }
     }
 }

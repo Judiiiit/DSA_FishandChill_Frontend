@@ -15,6 +15,7 @@ import com.example.android_proyecto.Adapters.LeaderboardAdapter;
 import com.example.android_proyecto.Models.LeaderboardEntry;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
+import com.example.android_proyecto.Services.AchievementsManager;
 import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
 
@@ -44,6 +45,8 @@ public class LeaderboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
+
+        new AchievementsManager(this).unlock(AchievementsManager.A_OPEN_LEADERBOARD);
 
         rvLeaderboard = findViewById(R.id.rvLeaderboard);
         progressLeaderboard = findViewById(R.id.progressLeaderboard);
@@ -96,7 +99,6 @@ public class LeaderboardActivity extends AppCompatActivity {
     private void bindLeaderboard(List<LeaderboardEntry> list) {
         if (list == null) list = new ArrayList<>();
 
-        // TOP 1
         if (list.size() > 0) {
             LeaderboardEntry e = list.get(0);
             tvTop1Name.setText(e.getUsername());
@@ -106,7 +108,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             tvTop1Value.setText("0");
         }
 
-        // TOP 2
         if (list.size() > 1) {
             LeaderboardEntry e = list.get(1);
             tvTop2Name.setText(e.getUsername());
@@ -116,7 +117,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             tvTop2Value.setText("0");
         }
 
-        // TOP 3
         if (list.size() > 2) {
             LeaderboardEntry e = list.get(2);
             tvTop3Name.setText(e.getUsername());
@@ -126,14 +126,12 @@ public class LeaderboardActivity extends AppCompatActivity {
             tvTop3Value.setText("0");
         }
 
-        // LISTA desde #4 en adelante
         List<LeaderboardEntry> rest = new ArrayList<>();
         if (list.size() > 3) {
             rest.addAll(list.subList(3, list.size()));
         }
         adapter.setItems(rest);
 
-        // TU POSICION
         String myUser = session.getUsername();
         int myIndex = -1;
         for (int i = 0; i < list.size(); i++) {

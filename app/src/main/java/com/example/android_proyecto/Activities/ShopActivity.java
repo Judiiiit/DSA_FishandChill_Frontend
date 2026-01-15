@@ -19,9 +19,9 @@ import com.example.android_proyecto.Models.SellCapturedFish;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
+import com.example.android_proyecto.Services.AchievementsManager;
 import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
-import com.example.android_proyecto.Utils.FishSellCalculator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -59,6 +59,8 @@ public class ShopActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
+
+        new AchievementsManager(this).unlock(AchievementsManager.A_OPEN_SHOP);
 
         tvCoins = findViewById(R.id.tvCoins);
         tvTotalFishes = findViewById(R.id.tvTotalFishes);
@@ -285,10 +287,10 @@ public class ShopActivity extends AppCompatActivity {
 
         SellCapturedFish req = new SellCapturedFish(fishSpeciesName, captureTimeIso, price);
 
-        api.sellCapturedFish(token, req).enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+        api.sellCapturedFish(token, req).enqueue(new retrofit2.Callback<ResponseBody>() {
             @Override
-            public void onResponse(retrofit2.Call<okhttp3.ResponseBody> call,
-                                   retrofit2.Response<okhttp3.ResponseBody> response) {
+            public void onResponse(retrofit2.Call<ResponseBody> call,
+                                   retrofit2.Response<ResponseBody> response) {
                 progress.setVisibility(View.GONE);
 
                 if (response.isSuccessful()) {
@@ -301,7 +303,7 @@ public class ShopActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(retrofit2.Call<okhttp3.ResponseBody> call, Throwable t) {
+            public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
                 progress.setVisibility(View.GONE);
                 Toast.makeText(ShopActivity.this, "Network error selling fish: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }

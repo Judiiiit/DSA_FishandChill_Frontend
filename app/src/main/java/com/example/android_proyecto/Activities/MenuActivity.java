@@ -26,6 +26,7 @@ import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
+import com.example.android_proyecto.Services.AchievementsManager;
 import com.example.android_proyecto.Services.SessionManager;
 
 import okhttp3.ResponseBody;
@@ -43,14 +44,16 @@ public class MenuActivity extends AppCompatActivity {
     private Button btnLeaderboard;
     private Button btnDeleteAccount;
 
+    private ImageButton btnAchievements;
+
     private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
     private TextView tvWelcomeUser;
 
-    // contador
     private TextView tvEventCountdown;
 
     private SessionManager session;
     private ApiService api;
+    private AchievementsManager achievements;
     private ActivityResultLauncher<Intent> unityLauncher;
 
     private SoundPool soundPool;
@@ -60,7 +63,7 @@ public class MenuActivity extends AppCompatActivity {
     private final Handler eventHandler = new Handler(Looper.getMainLooper());
     private Runnable eventRunnable;
 
-    private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L; // 10 minutos
+    private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,7 @@ public class MenuActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         api = RetrofitClient.getApiService();
+        achievements = new AchievementsManager(this);
 
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
@@ -103,6 +107,8 @@ public class MenuActivity extends AppCompatActivity {
         btnLeaderboard = findViewById(R.id.btnLeaderboard);
         btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
 
+        btnAchievements = findViewById(R.id.btnAchievements);
+
         tvEventCountdown = findViewById(R.id.tvEventCountdown);
 
         String username = session.getUsername();
@@ -121,6 +127,7 @@ public class MenuActivity extends AppCompatActivity {
 
         btnGoGame.setOnClickListener(v -> {
             playClick();
+            achievements.unlock(AchievementsManager.A_FIRST_STEPS);
             try {
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName(
@@ -162,6 +169,11 @@ public class MenuActivity extends AppCompatActivity {
         btnLeaderboard.setOnClickListener(v -> {
             playClick();
             startActivity(new Intent(this, LeaderboardActivity.class));
+        });
+
+        btnAchievements.setOnClickListener(v -> {
+            playClick();
+            startActivity(new Intent(this, AchievementsActivity.class));
         });
 
         btnBackFromSettings.setOnClickListener(v -> {

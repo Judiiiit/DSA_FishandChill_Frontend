@@ -13,10 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android_proyecto.R;
+import com.example.android_proyecto.Services.AchievementsManager;
 
 public class ChooseEventSplitActivity extends AppCompatActivity {
 
-    private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L; // 10 min
+    private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L;
 
     private FrameLayout activeEvent;
     private ImageView imgActive;
@@ -41,6 +42,8 @@ public class ChooseEventSplitActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_event_split);
+
+        new AchievementsManager(this).unlock(AchievementsManager.A_OPEN_EVENTS);
 
         Button btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());

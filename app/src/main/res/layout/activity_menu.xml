@@ -21,22 +21,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- CONTADOR (compacto) -->
     <TextView
         android:id="@+id/tvEventCountdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="4dp"
         android:fontFamily="@font/pixel_font"
         android:text="Active: -&#10;Next in: 10:00"
         android:textColor="#FFFFFF"
-        android:textSize="7sp"
+        android:textSize="9sp"
         android:lineSpacingExtra="1dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:background="#B3000000"
+        android:background="#99000000"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnEventUsers" />
 
@@ -279,5 +280,19 @@
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnAchievements"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="344dp"
+        android:layout_marginEnd="28dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Achievements"
+
+        android:scaleType="fitCenter"
+        android:src="@drawable/achievements"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,7 @@ import com.example.android_proyecto.Adapters.GroupsAdapter;
 import com.example.android_proyecto.Models.Group;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
+import com.example.android_proyecto.Services.AchievementsManager;
 import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
 
@@ -30,13 +31,15 @@ public class GroupsActivity extends AppCompatActivity {
     private RecyclerView recyclerGroups;
     private SessionManager session;
 
-    private final Set<Integer> joinedGroupIds = new HashSet<>(); // se rellena desde prefs
+    private final Set<Integer> joinedGroupIds = new HashSet<>();
     private GroupsAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
+
+        new AchievementsManager(this).unlock(AchievementsManager.A_OPEN_GROUPS);
 
         session = new SessionManager(this);
 
@@ -112,7 +115,7 @@ public class GroupsActivity extends AppCompatActivity {
     private void joinGroup(int groupId) {
         ApiService api = RetrofitClient.getApiService();
 
-        String token = session.getToken(); // sin Bearer
+        String token = session.getToken();
         if (token == null || token.isEmpty()) {
             Toast.makeText(this, "No token. Please login.", Toast.LENGTH_SHORT).show();
             return;
@@ -158,4 +161,3 @@ public class GroupsActivity extends AppCompatActivity {
         });
     }
 }
-

@@ -23,79 +23,64 @@
 
     <TextView
         android:id="@+id/tvTitle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/pixel_font"
-        android:text="Choose event"
+        android:text="CURRENT EVENT"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/btnBack"
-        app:layout_constraintTop_toTopOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/splitContainer"
+    <FrameLayout
+        android:id="@+id/activeEvent"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="22dp"
         android:layout_marginEnd="22dp"
         android:layout_marginTop="22dp"
-        android:layout_marginBottom="18dp"
-        android:orientation="horizontal"
+        android:layout_marginBottom="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@+id/btnBack"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvEventInfo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <FrameLayout
-            android:id="@+id/leftEvent"
-            android:layout_width="0dp"
+        <ImageView
+            android:id="@+id/imgActive"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginEnd="10dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:padding="8dp">
+            android:layout_gravity="center"
+            android:contentDescription="Active Event"
+            android:scaleType="fitCenter"
+            android:src="@drawable/event_fishing_storm" />
+    </FrameLayout>
 
-            <ImageView
-                android:id="@+id/imgLeft"
-                android:layout_width="match_parent"
-                android:layout_height="320dp"
-                android:layout_gravity="center"
-                android:contentDescription="Fishing Storm"
-                android:scaleType="fitCenter"
-                android:src="@drawable/event_fishing_storm" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/rightEvent"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:padding="8dp">
-
-            <ImageView
-                android:id="@+id/imgRight"
-                android:layout_width="match_parent"
-                android:layout_height="320dp"
-                android:layout_gravity="center"
-                android:contentDescription="Meteor Arrival"
-                android:scaleType="fitCenter"
-                android:src="@drawable/event_meteor_arrival" />
-
-
-        </FrameLayout>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tvEventInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginBottom="18dp"
+        android:fontFamily="@font/pixel_font"
+        android:text="Active: -&#10;Next in: 10:00"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:lineSpacingExtra="2dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:background="#B3000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +46,9 @@ public class MenuActivity extends AppCompatActivity {
     private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
     private TextView tvWelcomeUser;
 
+    // contador
+    private TextView tvEventCountdown;
+
     private SessionManager session;
     private ApiService api;
     private ActivityResultLauncher<Intent> unityLauncher;
@@ -51,6 +56,11 @@ public class MenuActivity extends AppCompatActivity {
     private SoundPool soundPool;
     private int soundClick;
     private int soundDanger;
+
+    private final Handler eventHandler = new Handler(Looper.getMainLooper());
+    private Runnable eventRunnable;
+
+    private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L; // 10 minutos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +102,8 @@ public class MenuActivity extends AppCompatActivity {
         btnEventUsers = findViewById(R.id.btnEventUsers);
         btnLeaderboard = findViewById(R.id.btnLeaderboard);
         btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
+
+        tvEventCountdown = findViewById(R.id.tvEventCountdown);
 
         String username = session.getUsername();
         tvWelcomeUser.setText("Welcome, " + username + "!");
@@ -174,6 +186,8 @@ public class MenuActivity extends AppCompatActivity {
                 }
             }
         });
+
+        updateEventCountdownUI();
     }
 
     private void playClick() {
@@ -301,9 +315,82 @@ public class MenuActivity extends AppCompatActivity {
         finish();
     }
 
+    private static class RotatingEvent {
+        final String id;
+        final String name;
+
+        RotatingEvent(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    private RotatingEvent getActiveEvent(long nowMs) {
+        long slot = nowMs / EVENT_ROTATION_MS;
+        boolean first = (slot % 2 == 0);
+        if (first) return new RotatingEvent("1", "Fishing Storm");
+        return new RotatingEvent("2", "Meteor Arrival");
+    }
+
+    private long getMillisUntilNextRotation(long nowMs) {
+        long inSlot = nowMs % EVENT_ROTATION_MS;
+        return EVENT_ROTATION_MS - inSlot;
+    }
+
+    private String formatMMSS(long ms) {
+        long totalSec = ms / 1000;
+        long min = totalSec / 60;
+        long sec = totalSec % 60;
+        return String.format("%02d:%02d", min, sec);
+    }
+
+    private void updateEventCountdownUI() {
+        long now = System.currentTimeMillis();
+        RotatingEvent ev = getActiveEvent(now);
+        long remaining = getMillisUntilNextRotation(now);
+
+        if (tvEventCountdown != null) {
+            tvEventCountdown.setText("Active: " + ev.name + "\nNext in: " + formatMMSS(remaining));
+        }
+    }
+
+    private void startEventCountdown() {
+        if (eventRunnable != null) return;
+
+        eventRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateEventCountdownUI();
+                eventHandler.postDelayed(this, 1000);
+            }
+        };
+        eventHandler.post(eventRunnable);
+    }
+
+    private void stopEventCountdown() {
+        if (eventRunnable != null) {
+            eventHandler.removeCallbacks(eventRunnable);
+            eventRunnable = null;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateEventCountdownUI();
+        startEventCountdown();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopEventCountdown();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopEventCountdown();
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;

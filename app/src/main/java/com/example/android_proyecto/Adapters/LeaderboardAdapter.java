@@ -37,22 +37,14 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     public void onBindViewHolder(@NonNull VH holder, int position) {
         LeaderboardEntry e = items.get(position);
 
-        int rank = position + 1;
+        int rank = position + 4; // porque top 1-3 se muestran arriba
 
         holder.tvRank.setText("#" + rank);
         holder.tvUsername.setText(e.getUsername());
         holder.tvTotal.setText(String.valueOf(e.getTotalFishes()));
 
-        // 🎖️ Fondo según posición
-        if (position == 0) {
-            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_gold);
-        } else if (position == 1) {
-            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_silver);
-        } else if (position == 2) {
-            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_bronze);
-        } else {
-            holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_normal);
-        }
+        // Desde #4 todo normal
+        holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_normal);
     }
 
     @Override

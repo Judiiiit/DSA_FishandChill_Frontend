@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android_proyecto.MainActivity;
@@ -37,6 +38,8 @@ public class MenuActivity extends AppCompatActivity {
     private Button btnEventUsers;
 
     private Button btnLeaderboard;
+
+    private Button btnDeleteAccount;
 
     private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
     private TextView tvWelcomeUser;
@@ -71,6 +74,9 @@ public class MenuActivity extends AppCompatActivity {
         btnEventUsers = findViewById(R.id.btnEventUsers);
 
         btnLeaderboard = findViewById(R.id.btnLeaderboard);
+
+        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
+        btnDeleteAccount.setOnClickListener(v -> confirmDeleteAccount());
 
         String username = session.getUsername();
         tvWelcomeUser.setText("Welcome, " + username + "!");
@@ -221,6 +227,49 @@ public class MenuActivity extends AppCompatActivity {
                 session.clear();
                 Toast.makeText(MenuActivity.this, "Logged out (connection error: " + t.getMessage() + ")", Toast.LENGTH_SHORT).show();
                 goToMain();
+            }
+        });
+    }
+
+    private void confirmDeleteAccount() {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar cuenta")
+                .setMessage("Esta acción es permanente. ¿Seguro que quieres eliminar tu cuenta?")
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("Eliminar", (dialog, which) -> doDeleteAccount())
+                .show();
+    }
+
+    private void doDeleteAccount() {
+        String token = session.getToken();
+
+        if (token == null) {
+            Toast.makeText(this, "No hay sesión activa", Toast.LENGTH_SHORT).show();
+            session.clear();
+            goToMain();
+            return;
+        }
+
+        btnDeleteAccount.setEnabled(false);
+
+        api.deleteMe(token).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                btnDeleteAccount.setEnabled(true);
+
+                if (response.isSuccessful()) {
+                    session.clear();
+                    Toast.makeText(MenuActivity.this, "Cuenta eliminada", Toast.LENGTH_SHORT).show();
+                    goToMain();
+                } else {
+                    Toast.makeText(MenuActivity.this, "No se pudo eliminar (HTTP " + response.code() + ")", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                btnDeleteAccount.setEnabled(true);
+                Toast.makeText(MenuActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

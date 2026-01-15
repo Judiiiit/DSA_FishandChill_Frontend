@@ -213,6 +213,20 @@
                 android:textSize="10sp"
                 android:alpha="0.85" />
 
+            <Button
+                android:id="@+id/btnDeleteAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/pixel_button_bg"
+                android:fontFamily="@font/pixel_font"
+                android:text="Eliminar cuenta"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@android:color/holo_red_dark"
+                app:backgroundTint="@null" />
+
         </LinearLayout>
     </FrameLayout>
 

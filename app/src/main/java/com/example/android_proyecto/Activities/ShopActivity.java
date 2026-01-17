@@ -38,7 +38,7 @@ public class ShopActivity extends AppCompatActivity {
     private TextView tvCoins, tvTotalFishes, tvInitialMessage, tvShopTitle;
     private RecyclerView rvRods, rvFishes;
     private ProgressBar progress;
-    private Button btnBack, btnRods, btnInventory, btnFishes;
+    private Button btnBack, btnRods, btnFishes;
 
     private RodsAdapter rodsAdapter;
     private CapturedFishAdapter fishesAdapter;

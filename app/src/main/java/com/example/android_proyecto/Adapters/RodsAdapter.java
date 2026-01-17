@@ -163,9 +163,9 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
 
             GradientDrawable imgBg = new GradientDrawable();
             imgBg.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-            imgBg.setGradientRadius(200f);
+            imgBg.setGradientRadius(210f);
             int c1 = setAlpha(baseColor, 150);
-            int c2 = setAlpha(baseColor, 60);
+            int c2 = setAlpha(baseColor, 100);
             int c3 = Color.TRANSPARENT;
             imgBg.setColors(new int[]{c1, c2, c3});
             holder.imgRod.setBackground(imgBg);
@@ -197,9 +197,9 @@ public class RodsAdapter extends RecyclerView.Adapter<RodsAdapter.RodViewHolder>
 
             GradientDrawable imgBg = new GradientDrawable();
             imgBg.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-            imgBg.setGradientRadius(200f);
+            imgBg.setGradientRadius(210f);
             int c1 = setAlpha(animatedColor, 150);
-            int c2 = setAlpha(animatedColor, 60);
+            int c2 = setAlpha(animatedColor, 100);
             int c3 = Color.TRANSPARENT;
             imgBg.setColors(new int[]{c1, c2, c3});
             holder.imgRod.setBackground(imgBg);

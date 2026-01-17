@@ -1,6 +1,9 @@
 package com.example.android_proyecto.Adapters;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
@@ -9,11 +12,13 @@ import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -23,9 +28,14 @@ import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Utils.FishSellCalculator;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapter.FishViewHolder> {
@@ -34,16 +44,27 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
         void onSellClick(CapturedFish capturedFish, int coinsGained);
     }
 
-    private List<CapturedFish> fishes = new ArrayList<>();
+    private List<List<CapturedFish>> fishStacks = new ArrayList<>();
     private Set<String> soldFishKeys = new HashSet<>();
-    private OnFishClickListener listener;
+    private final OnFishClickListener listener;
 
     public CapturedFishAdapter(OnFishClickListener listener) {
         this.listener = listener;
     }
 
-    public void setFishes(List<CapturedFish> fishes) {
-        this.fishes = fishes != null ? fishes : new ArrayList<>();
+    public void setFishes(List<CapturedFish> rawFishes) {
+        if (rawFishes == null) rawFishes = new ArrayList<>();
+
+        Map<String, List<CapturedFish>> groups = new HashMap<>();
+        for (CapturedFish cf : rawFishes) {
+            String name = (cf.getFishSpecies() != null) ? cf.getFishSpecies().getSpeciesName() : "Unknown";
+            if (!groups.containsKey(name)) {
+                groups.put(name, new ArrayList<>());
+            }
+            groups.get(name).add(cf);
+        }
+
+        this.fishStacks = new ArrayList<>(groups.values());
         notifyDataSetChanged();
     }
 
@@ -61,79 +82,109 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FishViewHolder holder, int position) {
-        CapturedFish cf = fishes.get(position);
-        Fish fish = (cf != null) ? cf.getFishSpecies() : null;
+        List<CapturedFish> stack = fishStacks.get(position);
+        if (stack.isEmpty()) return;
 
-        String name = (fish != null && fish.getSpeciesName() != null) ? fish.getSpeciesName() : "Unknown";
-        int rarity = (fish != null) ? fish.getRarity() : 1;
-        double weight = (cf != null) ? cf.getWeight() : 0.0;
-        String captureTime = (cf != null) ? cf.getCaptureTime() : null;
+        CapturedFish topFish = stack.get(0);
+        Fish species = topFish.getFishSpecies();
 
+        // 1. Stack Visuals
+        int stackSize = stack.size();
+        holder.tvStackCount.setText(String.valueOf(stackSize));
+        holder.tvStackCount.setVisibility(stackSize > 1 ? View.VISIBLE : View.GONE);
+        holder.cardBg1.setVisibility(stackSize > 1 ? View.VISIBLE : View.INVISIBLE);
+        holder.cardBg2.setVisibility(stackSize > 2 ? View.VISIBLE : View.INVISIBLE);
+
+        holder.btnRotate.setVisibility(stackSize > 1 ? View.VISIBLE : View.GONE);
+        holder.btnRotate.setOnClickListener(v -> rotateStack(holder, stack, position));
+
+        // 2. Basic Data
+        String name = (species != null) ? species.getSpeciesName() : "Unknown";
+        int rarity = (species != null) ? species.getRarity() : 1;
+        double weight = topFish.getWeight();
         int coins = FishSellCalculator.calculateCoins(weight, rarity);
 
         holder.tvFishName.setText(name);
-        holder.tvFishValue.setText("Value: " + coins);
+        holder.tvFishValue.setText("💰 " + coins);
 
-        holder.tvFishDesc.setText(
-                "Weight: " + String.format("%.2f", weight) + " kg\n" +
-                        "Rarity: " + rarityToLabel(rarity) + "\n" +
-                        "Caught: " + formatDate(captureTime)
-        );
+        // --- UPDATED TEXT FORMATTING ---
+        // Format: Weight 2.5kg\nCaptured: 17/03/25 (17:24:21)
+        String weightStr = String.format(Locale.US, "Weight: %.1fkg", weight);
+        String dateStr = "Captured: " + formatDate(topFish.getCaptureTime());
 
-        if (fish != null && fish.getUrl() != null) {
+        holder.tvFishDesc.setText(weightStr + "\n" + dateStr);
+        // -------------------------------
+
+        if (species != null && species.getUrl() != null) {
             Glide.with(holder.itemView.getContext())
-                    .load(RetrofitClient.SERVER_URL + fish.getUrl())
+                    .load(RetrofitClient.SERVER_URL + species.getUrl())
                     .into(holder.imgFish);
-        } else {
-            holder.imgFish.setImageResource(android.R.drawable.ic_menu_gallery);
         }
 
-        applyRarityVisuals(holder, String.valueOf(rarity));
-
-        String key = buildKey(name, weight, captureTime);
-        boolean isSold = soldFishKeys.contains(key);
-
-        if (isSold) {
+        // 3. Sell Logic
+        String key = buildKey(name, weight, topFish.getCaptureTime());
+        if (soldFishKeys.contains(key)) {
+            holder.btnSell.setText("Sold");
             holder.btnSell.setEnabled(false);
-            holder.btnSell.setAlpha(0.4f);
-            holder.btnSell.setImageResource(android.R.drawable.checkbox_on_background);
-            holder.btnSell.setOnClickListener(null);
+            holder.btnSell.setAlpha(0.5f);
         } else {
+            holder.btnSell.setText("Sell");
             holder.btnSell.setEnabled(true);
             holder.btnSell.setAlpha(1.0f);
-            holder.btnSell.setImageResource(android.R.drawable.ic_menu_add);
             holder.btnSell.setOnClickListener(v -> {
-                if (listener != null) listener.onSellClick(cf, coins);
+                listener.onSellClick(topFish, coins);
             });
         }
+
+        // 4. Colors & Gradients
+        applyRarityVisuals(holder, rarity);
     }
 
-    private void applyRarityVisuals(FishViewHolder holder, String rarityStr) {
-        int rarity;
-        try {
-            rarity = Integer.parseInt(rarityStr);
-        } catch (NumberFormatException e) {
-            rarity = 1;
-        }
+    private void rotateStack(FishViewHolder holder, List<CapturedFish> stack, int adapterPosition) {
+        if (stack.size() <= 1) return;
 
+        holder.btnRotate.setEnabled(false);
+
+        holder.cardFront.animate()
+                .translationX(400f)
+                .rotation(20f)
+                .alpha(0f)
+                .setDuration(300)
+                .setListener(new AnimatorListenerAdapter() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        CapturedFish movedFish = stack.remove(0);
+                        stack.add(movedFish);
+
+                        holder.cardFront.setTranslationX(0f);
+                        holder.cardFront.setRotation(0f);
+                        holder.cardFront.setAlpha(1f);
+
+                        notifyItemChanged(adapterPosition);
+                        holder.btnRotate.setEnabled(true);
+                    }
+                }).start();
+    }
+
+    private void applyRarityVisuals(FishViewHolder holder, int rarity) {
         if (holder.rainbowAnimator != null) {
             holder.rainbowAnimator.cancel();
             holder.rainbowAnimator = null;
         }
 
-        if (holder.containerInfo != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            holder.containerInfo.setRenderEffect(RenderEffect.createBlurEffect(2.0f, 2.0f, Shader.TileMode.CLAMP));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            holder.containerRight.setRenderEffect(RenderEffect.createBlurEffect(2.0f, 2.0f, Shader.TileMode.CLAMP));
         }
 
-        if (rarity >= 5) {
+        if (rarity >= 3) {
             applyRainbowAnimation(holder);
         } else {
             int baseColor;
-            switch (rarity) {
-                case 2: baseColor = Color.parseColor("#3b82f6"); break;
-                case 3: baseColor = Color.parseColor("#a855f7"); break;
-                case 4: baseColor = Color.parseColor("#ff7f7f"); break;
-                default: baseColor = Color.parseColor("#3bd671"); break;
+            if (rarity == 2) {
+                baseColor = Color.parseColor("#a855f7"); // Purple
+            } else {
+                baseColor = Color.parseColor("#3bd671"); // Green
             }
 
             holder.tvFishName.setTextColor(baseColor);
@@ -141,20 +192,20 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
 
             GradientDrawable imgBg = new GradientDrawable();
             imgBg.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-            imgBg.setGradientRadius(200f);
-            int c1 = setAlpha(baseColor, 150);
-            int c2 = setAlpha(baseColor, 60);
+            // --- UPDATED RADIUS: Reduced to 200f to fade out at borders ---
+            imgBg.setGradientRadius(210f);
+            // -----------------------------------------------
+            int c1 = setAlpha(baseColor, 255);
+            int c2 = setAlpha(baseColor, 230);
             int c3 = Color.TRANSPARENT;
             imgBg.setColors(new int[]{c1, c2, c3});
             holder.imgFish.setBackground(imgBg);
 
-            if (holder.containerInfo != null) {
-                GradientDrawable infoBg = new GradientDrawable();
-                infoBg.setColor(setAlpha(baseColor, 30));
-                infoBg.setCornerRadius(12 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
-                infoBg.setStroke(2, setAlpha(baseColor, 80));
-                holder.containerInfo.setBackground(infoBg);
-            }
+            GradientDrawable infoBg = new GradientDrawable();
+            infoBg.setColor(setAlpha(baseColor, 30));
+            infoBg.setCornerRadius(12 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
+            infoBg.setStroke(2, setAlpha(baseColor, 80));
+            holder.containerRight.setBackground(infoBg);
         }
     }
 
@@ -171,28 +222,23 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.addUpdateListener(animation -> {
             int animatedColor = (int) animation.getAnimatedValue();
-
             holder.tvFishName.setTextColor(animatedColor);
             holder.tvFishName.setShadowLayer(20, 0, 0, Color.WHITE);
 
             GradientDrawable imgBg = new GradientDrawable();
             imgBg.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-            imgBg.setGradientRadius(200f);
-            int c1 = setAlpha(animatedColor, 150);
-            int c2 = setAlpha(animatedColor, 60);
-            int c3 = Color.TRANSPARENT;
-            imgBg.setColors(new int[]{c1, c2, c3});
+            // --- UPDATED RADIUS: Reduced to 200f to fade out at borders ---
+            imgBg.setGradientRadius(210f);
+            // ----------------------
+            imgBg.setColors(new int[]{setAlpha(animatedColor, 150), setAlpha(animatedColor, 100), Color.TRANSPARENT});
             holder.imgFish.setBackground(imgBg);
 
-            if (holder.containerInfo != null) {
-                GradientDrawable infoBg = new GradientDrawable();
-                infoBg.setColor(setAlpha(animatedColor, 20));
-                infoBg.setCornerRadius(12 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
-                infoBg.setStroke(3, setAlpha(animatedColor, 120));
-                holder.containerInfo.setBackground(infoBg);
-            }
+            GradientDrawable infoBg = new GradientDrawable();
+            infoBg.setColor(setAlpha(animatedColor, 20));
+            infoBg.setCornerRadius(12 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
+            infoBg.setStroke(3, setAlpha(animatedColor, 120));
+            holder.containerRight.setBackground(infoBg);
         });
-
         animator.start();
         holder.rainbowAnimator = animator;
     }
@@ -201,46 +247,55 @@ public class CapturedFishAdapter extends RecyclerView.Adapter<CapturedFishAdapte
         return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
     }
 
-    @Override
-    public int getItemCount() {
-        return fishes.size();
-    }
-
-    static class FishViewHolder extends RecyclerView.ViewHolder {
-        TextView tvFishName, tvFishDesc, tvFishValue;
-        ImageButton btnSell;
-        ImageView imgFish;
-        View containerInfo;
-        ValueAnimator rainbowAnimator;
-
-        FishViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvFishName = itemView.findViewById(R.id.tvFishName);
-            tvFishDesc = itemView.findViewById(R.id.tvFishDesc);
-            tvFishValue = itemView.findViewById(R.id.tvFishValue);
-            btnSell = itemView.findViewById(R.id.btnSellFish);
-            imgFish = itemView.findViewById(R.id.imgFish);
-            containerInfo = itemView.findViewById(R.id.containerInfo);
-        }
-    }
-
-    private String rarityToLabel(int rarity) {
-        switch (rarity) {
-            case 2: return "Rare";
-            case 3: return "Epic";
-            case 4: return "Mythic";
-            case 5: return "Titanium";
-            default: return "Common";
-        }
-    }
-
     private String formatDate(String t) {
         if (t == null) return "-";
-        return t.replace("T", " ").replace("Z", "");
+        try {
+            // Input: yyyy-MM-dd'T'HH:mm:ss
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+            Date date = inputFormat.parse(t);
+
+            // Output: 17/03/25 (17:24:21)
+            // dd/MM/yy (HH:mm:ss)
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yy (HH:mm:ss)", Locale.getDefault());
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            return t;
+        }
     }
 
     private String buildKey(String name, double weight, String captureTime) {
         if (captureTime == null) captureTime = "-";
         return name + "|" + weight + "|" + captureTime;
+    }
+
+    @Override
+    public int getItemCount() {
+        return fishStacks.size();
+    }
+
+    static class FishViewHolder extends RecyclerView.ViewHolder {
+        CardView cardFront, cardBg1, cardBg2;
+        TextView tvFishName, tvFishDesc, tvFishValue, tvStackCount;
+        Button btnSell;
+        ImageButton btnRotate;
+        ImageView imgFish;
+        View containerRight;
+        ValueAnimator rainbowAnimator;
+
+        FishViewHolder(@NonNull View itemView) {
+            super(itemView);
+            cardFront = itemView.findViewById(R.id.cardFront);
+            cardBg1 = itemView.findViewById(R.id.cardBg1);
+            cardBg2 = itemView.findViewById(R.id.cardBg2);
+            tvStackCount = itemView.findViewById(R.id.tvStackCount);
+
+            tvFishName = itemView.findViewById(R.id.tvFishName);
+            tvFishDesc = itemView.findViewById(R.id.tvFishDesc);
+            tvFishValue = itemView.findViewById(R.id.tvFishValue);
+            btnSell = itemView.findViewById(R.id.btnSellFish);
+            btnRotate = itemView.findViewById(R.id.btnRotate);
+            imgFish = itemView.findViewById(R.id.imgFish);
+            containerRight = itemView.findViewById(R.id.containerRight);
+        }
     }
 }

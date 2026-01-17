@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/containerMainFish"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_login_card"
         android:padding="12dp">
 
@@ -23,7 +23,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.45">
+            app:layout_constraintWidth_percent="0.35">
 
             <ImageView
                 android:id="@+id/imgFish"
@@ -56,7 +56,7 @@
         <LinearLayout
             android:id="@+id/containerInfo"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:background="#40000000"
             android:gravity="center_horizontal"
@@ -65,9 +65,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/containerLeftFish"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" >
 
-            <TextView
+        <TextView
                 android:id="@+id/tvFishName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,35 +79,38 @@
                 android:shadowRadius="10"
                 android:text="Crystalline"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeMinTextSize="10sp"
+                android:autoSizeStepGranularity="1sp"
+                android:paddingVertical="2dp" />
+
 
             <TextView
                 android:id="@+id/tvFishDesc"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pixel_font"
                 android:gravity="center"
-                android:lineSpacingExtra="4dp"
+                android:lineSpacingExtra="6dp"
                 android:text="Weight: 2.10 kg\nRarity: Common\nCaught: 2025-12-24"
                 android:textColor="#DDDDDD"
-                android:textSize="12sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:autoSizeTextType="uniform"
+                android:autoSizeMaxTextSize="12sp"
+                android:autoSizeMinTextSize="8sp"
+                android:autoSizeStepGranularity="1sp" />
+
 
             <TextView
                 android:id="@+id/tvFishValue"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:fontFamily="@font/pixel_font"
                 android:text="💰 5"
                 android:textColor="#FFC107"

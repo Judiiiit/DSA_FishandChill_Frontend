@@ -34,6 +34,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.view.LayoutInflater;
+import android.widget.ImageView;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.android_proyecto.Adapters.AvatarAdapter;
+
+
 public class MenuActivity extends AppCompatActivity {
 
     private Button btnGoGame, btnGoShop, btnLogout;
@@ -62,6 +71,9 @@ public class MenuActivity extends AppCompatActivity {
 
     private final Handler eventHandler = new Handler(Looper.getMainLooper());
     private Runnable eventRunnable;
+
+    private Button btnChooseAvatar;
+    private int[] avatarResIds;
 
     private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L;
 
@@ -106,6 +118,22 @@ public class MenuActivity extends AppCompatActivity {
         btnEventUsers = findViewById(R.id.btnEventUsers);
         btnLeaderboard = findViewById(R.id.btnLeaderboard);
         btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
+        btnChooseAvatar = findViewById(R.id.btnChooseAvatar);
+
+        avatarResIds = new int[] {
+                R.drawable.avatar_1,
+                R.drawable.avatar_2,
+                R.drawable.avatar_3
+        };
+
+        int currentAvatar = session.getAvatarResId(R.drawable.settings);
+        btnSettings.setImageResource(currentAvatar);
+
+        btnChooseAvatar.setOnClickListener(v -> {
+            playClick();
+            showAvatarPickerDialog();
+        });
+
 
         btnAchievements = findViewById(R.id.btnAchievements);
 
@@ -364,6 +392,29 @@ public class MenuActivity extends AppCompatActivity {
         if (tvEventCountdown != null) {
             tvEventCountdown.setText("Active: " + ev.name + "\nNext in: " + formatMMSS(remaining));
         }
+    }
+
+    private void showAvatarPickerDialog() {
+        int current = session.getAvatarResId(R.drawable.settings);
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_avatar_picker, null);
+        RecyclerView rv = dialogView.findViewById(R.id.rvAvatars);
+
+        rv.setLayoutManager(new GridLayoutManager(this, 3));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setNegativeButton("Cancel", (d, w) -> d.dismiss())
+                .create();
+
+        AvatarAdapter adapter = new AvatarAdapter(avatarResIds, current, resId -> {
+            session.saveAvatarResId(resId);
+            btnSettings.setImageResource(resId);     // actualiza el icono del botón settings
+            dialog.dismiss();
+        });
+
+        rv.setAdapter(adapter);
+        dialog.show();
     }
 
     private void startEventCountdown() {

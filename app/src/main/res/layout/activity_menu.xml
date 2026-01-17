@@ -28,16 +28,16 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
         android:layout_marginTop="4dp"
+        android:background="#99000000"
         android:fontFamily="@font/pixel_font"
+        android:lineSpacingExtra="1dp"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp"
         android:text="Active: -&#10;Next in: 10:00"
         android:textColor="#FFFFFF"
         android:textSize="9sp"
-        android:lineSpacingExtra="1dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:background="#99000000"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnEventUsers" />
 
@@ -49,8 +49,8 @@
         android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
         android:contentDescription="Settings"
-        android:padding="6dp"
-        android:scaleType="fitCenter"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -164,90 +164,129 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.664">
 
-        <LinearLayout
+        <!-- ✅ NUEVA ESTRUCTURA: título arriba, info centro, botones abajo -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/tvSettingsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginTop="6dp"
                 android:fontFamily="@font/pixel_font"
                 android:text="Settings"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-            <TextView
-                android:id="@+id/tvProfileUsername"
-                android:layout_width="wrap_content"
+            <!-- INFO (centrada entre título y botones) -->
+            <LinearLayout
+                android:id="@+id/settingsInfo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle"
+                app:layout_constraintBottom_toTopOf="@id/settingsButtons"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0">
+
+                <TextView
+                    android:id="@+id/tvProfileUsername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Username: -"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvProfileEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Email: -"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvProfileCoins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Coins: -"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvProfilePassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Password: ********"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvProfilePasswordNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:alpha="0.85"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="(No se muestra por seguridad)"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp" />
+
+            </LinearLayout>
+
+            <!-- BOTONES ANCLADOS ABAJO -->
+            <LinearLayout
+                android:id="@+id/settingsButtons"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:fontFamily="@font/pixel_font"
-                android:text="Username: -"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
-                android:id="@+id/tvProfileEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/pixel_font"
-                android:text="Email: -"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
+                <Button
+                    android:id="@+id/btnChooseAvatar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/pixel_button_bg"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Choose avatar"
+                    android:textAllCaps="false"
+                    android:textSize="10sp"
+                    app:backgroundTint="@null" />
 
-            <TextView
-                android:id="@+id/tvProfileCoins"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/pixel_font"
-                android:text="Coins: -"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
+                <Button
+                    android:id="@+id/btnDeleteAccount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/pixel_button_bg"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Delete account"
+                    android:textAllCaps="false"
+                    android:textSize="10sp"
+                    app:backgroundTint="@null" />
 
-            <TextView
-                android:id="@+id/tvProfilePassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/pixel_font"
-                android:text="Password: ********"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvProfilePasswordNote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:fontFamily="@font/pixel_font"
-                android:text="(No se muestra por seguridad)"
-                android:textColor="#FFFFFF"
-                android:textSize="10sp"
-                android:alpha="0.85" />
-
-            <Button
-                android:id="@+id/btnDeleteAccount"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/pixel_button_bg"
-                android:fontFamily="@font/pixel_font"
-                android:text="Eliminar cuenta"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="@android:color/holo_red_dark"
-                app:backgroundTint="@null" />
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 
     <Button
@@ -289,7 +328,6 @@
         android:layout_marginEnd="28dp"
         android:background="@android:color/transparent"
         android:contentDescription="Achievements"
-
         android:scaleType="fitCenter"
         android:src="@drawable/achievements"
         app:layout_constraintEnd_toEndOf="parent"

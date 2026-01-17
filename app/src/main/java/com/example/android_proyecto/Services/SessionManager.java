@@ -14,6 +14,7 @@ public class SessionManager {
 
     private static final String KEY_JOINED_GROUPS = "joined_groups";
 
+    private static final String KEY_AVATAR_RES_PREFIX = "avatar_res_";
 
 
     private final SharedPreferences sp;
@@ -68,16 +69,31 @@ public class SessionManager {
         sp.edit().putStringSet(KEY_JOINED_GROUPS + username, stored).apply();
     }
 
+    public void saveAvatarResId(int resId) {
+        String username = getUsername();
+        if (username == null) return;
+        sp.edit().putInt(KEY_AVATAR_RES_PREFIX + username, resId).apply();
+    }
+
+    public int getAvatarResId(int defaultResId) {
+        String username = getUsername();
+        if (username == null) return defaultResId;
+        return sp.getInt(KEY_AVATAR_RES_PREFIX + username, defaultResId);
+    }
 
     public void clear() {
+        String username = getUsername();
 
         SharedPreferences.Editor editor = sp.edit();
-
         editor.remove(KEY_TOKEN);
+
+        if (username != null) {
+            editor.remove(KEY_AVATAR_RES_PREFIX + username);
+            editor.remove(KEY_JOINED_GROUPS + username);
+        }
+
         editor.remove(USER_NAME);
-        editor.remove(KEY_JOINED_GROUPS);
-
-
         editor.apply();
     }
+
 }

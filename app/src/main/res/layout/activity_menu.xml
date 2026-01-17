@@ -21,23 +21,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- CONTADOR (compacto) -->
     <TextView
         android:id="@+id/tvEventCountdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="3dp"
         android:background="#99000000"
         android:fontFamily="@font/pixel_font"
         android:lineSpacingExtra="1dp"
-        android:paddingStart="8dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp"
+        android:paddingStart="7dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="7dp"
+        android:paddingBottom="3dp"
         android:text="Active: -&#10;Next in: 10:00"
         android:textColor="#FFFFFF"
-        android:textSize="9sp"
+        android:textSize="7sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnEventUsers" />
 
@@ -277,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="34dp"
                     android:layout_marginTop="6dp"
-                    android:background="@drawable/pixel_button_bg"
+                    android:background="@drawable/pixel_button_bg_red"
                     android:fontFamily="@font/pixel_font"
                     android:text="Delete account"
                     android:textAllCaps="false"

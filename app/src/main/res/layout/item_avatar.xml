@@ -2,18 +2,63 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardAvatar"
-    android:layout_width="72dp"
-    android:layout_height="72dp"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
     android:layout_margin="8dp"
-    app:cardCornerRadius="36dp"
-    app:cardElevation="0dp"
+    app:cardCornerRadius="14dp"
+    app:cardUseCompatPadding="true"
     app:strokeWidth="3dp"
-    app:strokeColor="@android:color/transparent">
+    app:strokeColor="@android:color/transparent"
+    app:cardBackgroundColor="#1A000000">
 
-    <ImageView
-        android:id="@+id/ivAvatar"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/ivSelected"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_check"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/lockedOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99000000"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ivLock"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock"
+                android:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/tvLockedReason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/pixel_font"
+                android:text="Locked"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </FrameLayout>
 
 </com.google.android.material.card.MaterialCardView>

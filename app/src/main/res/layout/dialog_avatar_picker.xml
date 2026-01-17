@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/avatarPickerRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_panel_dark"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -11,13 +13,62 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/pixel_font"
         android:text="Choose your avatar"
-        android:textSize="16sp"
-        android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="12dp"/>
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvAvatarSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pixel_font"
+        android:layout_marginTop="6dp"
+        android:text="Locked avatars require achievements"
+        android:textColor="#BFFFFFFF"
+        android:textSize="12sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAvatars"
         android:layout_width="match_parent"
-        android:layout_height="260dp"/>
+        android:layout_height="320dp"
+        android:layout_marginTop="14dp" />
+
+    <TextView
+        android:id="@+id/tvAvatarHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#66000000"
+        android:fontFamily="@font/pixel_font"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="8dp"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCloseAvatarPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/pixel_button_bg_red"
+            android:fontFamily="@font/pixel_font"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="Close"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
 </LinearLayout>

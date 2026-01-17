@@ -7,7 +7,9 @@ import com.example.android_proyecto.Models.AchievementItem;
 import com.example.android_proyecto.R;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AchievementsManager {
 
@@ -81,5 +83,15 @@ public class AchievementsManager {
         ));
 
         return list;
+    }
+
+    public Set<String> getUnlockedIds() {
+        Set<String> out = new HashSet<>();
+        List<AchievementItem> all = getAll();
+        if (all == null) return out;
+        for (AchievementItem it : all) {
+            if (it != null && it.isUnlocked()) out.add(it.getId());
+        }
+        return out;
     }
 }

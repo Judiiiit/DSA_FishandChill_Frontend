@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -21,12 +22,17 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.android_proyecto.Adapters.AvatarAdapter;
 import com.example.android_proyecto.MainActivity;
+import com.example.android_proyecto.Models.AvatarItem;
+import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
-import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.AchievementsManager;
+import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
 
 import okhttp3.ResponseBody;
@@ -34,35 +40,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import android.view.LayoutInflater;
-import android.widget.ImageView;
-
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.android_proyecto.Adapters.AvatarAdapter;
-
-
 public class MenuActivity extends AppCompatActivity {
 
     private Button btnGoGame, btnGoShop, btnLogout;
-    private ImageButton btnSettings, btnGroups;
+    private ImageButton btnSettings, btnGroups, btnAchievements;
+    private Button btnEventUsers, btnLeaderboard, btnDeleteAccount, btnBackFromSettings, btnChooseAvatar;
     private FrameLayout settingsPanel;
-    private Button btnBackFromSettings;
-    private Button btnEventUsers;
-    private Button btnLeaderboard;
-    private Button btnDeleteAccount;
-
-    private ImageButton btnAchievements;
 
     private TextView tvProfileUsername, tvProfileEmail, tvProfileCoins, tvProfilePassword;
-    private TextView tvWelcomeUser;
-
-    private TextView tvEventCountdown;
+    private TextView tvWelcomeUser, tvEventCountdown;
 
     private SessionManager session;
     private ApiService api;
     private AchievementsManager achievements;
+
     private ActivityResultLauncher<Intent> unityLauncher;
 
     private SoundPool soundPool;
@@ -71,9 +62,6 @@ public class MenuActivity extends AppCompatActivity {
 
     private final Handler eventHandler = new Handler(Looper.getMainLooper());
     private Runnable eventRunnable;
-
-    private Button btnChooseAvatar;
-    private int[] avatarResIds;
 
     private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L;
 
@@ -105,42 +93,32 @@ public class MenuActivity extends AppCompatActivity {
 
         btnSettings = findViewById(R.id.btnSettings);
         btnGroups = findViewById(R.id.btnGroups);
+        btnAchievements = findViewById(R.id.btnAchievements);
+
+        btnEventUsers = findViewById(R.id.btnEventUsers);
+        btnLeaderboard = findViewById(R.id.btnLeaderboard);
 
         settingsPanel = findViewById(R.id.settingsPanel);
         btnBackFromSettings = findViewById(R.id.btnBackFromSettings);
-        tvWelcomeUser = findViewById(R.id.tvWelcomeUser);
+        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
+        btnChooseAvatar = findViewById(R.id.btnChooseAvatar);
 
+        tvWelcomeUser = findViewById(R.id.tvWelcomeUser);
         tvProfileUsername = findViewById(R.id.tvProfileUsername);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
         tvProfileCoins = findViewById(R.id.tvProfileCoins);
         tvProfilePassword = findViewById(R.id.tvProfilePassword);
+        tvEventCountdown = findViewById(R.id.tvEventCountdown);
 
-        btnEventUsers = findViewById(R.id.btnEventUsers);
-        btnLeaderboard = findViewById(R.id.btnLeaderboard);
-        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
-        btnChooseAvatar = findViewById(R.id.btnChooseAvatar);
-
-        avatarResIds = new int[] {
-                R.drawable.avatar_1,
-                R.drawable.avatar_2,
-                R.drawable.avatar_3
-        };
-
-        int currentAvatar = session.getAvatarResId(R.drawable.settings);
+        int currentAvatar = session.getAvatarResId(R.drawable.avatar_1);
         btnSettings.setImageResource(currentAvatar);
+
+        tvWelcomeUser.setText("Welcome, " + session.getUsername() + "!");
 
         btnChooseAvatar.setOnClickListener(v -> {
             playClick();
             showAvatarPickerDialog();
         });
-
-
-        btnAchievements = findViewById(R.id.btnAchievements);
-
-        tvEventCountdown = findViewById(R.id.tvEventCountdown);
-
-        String username = session.getUsername();
-        tvWelcomeUser.setText("Welcome, " + username + "!");
 
         unityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -171,37 +149,36 @@ public class MenuActivity extends AppCompatActivity {
 
         btnGoShop.setOnClickListener(v -> {
             playClick();
+            achievements.unlock(AchievementsManager.A_OPEN_SHOP);
             startActivity(new Intent(this, ShopActivity.class));
-        });
-
-        btnLogout.setOnClickListener(v -> {
-            playClick();
-            doLogout();
-        });
-
-        btnSettings.setOnClickListener(v -> {
-            playClick();
-            openSettings();
         });
 
         btnGroups.setOnClickListener(v -> {
             playClick();
+            achievements.unlock(AchievementsManager.A_OPEN_GROUPS);
             startActivity(new Intent(this, GroupsActivity.class));
         });
 
         btnEventUsers.setOnClickListener(v -> {
             playClick();
+            achievements.unlock(AchievementsManager.A_OPEN_EVENTS);
             startActivity(new Intent(this, ChooseEventSplitActivity.class));
         });
 
         btnLeaderboard.setOnClickListener(v -> {
             playClick();
+            achievements.unlock(AchievementsManager.A_OPEN_LEADERBOARD);
             startActivity(new Intent(this, LeaderboardActivity.class));
         });
 
         btnAchievements.setOnClickListener(v -> {
             playClick();
             startActivity(new Intent(this, AchievementsActivity.class));
+        });
+
+        btnSettings.setOnClickListener(v -> {
+            playClick();
+            openSettings();
         });
 
         btnBackFromSettings.setOnClickListener(v -> {
@@ -212,6 +189,11 @@ public class MenuActivity extends AppCompatActivity {
         btnDeleteAccount.setOnClickListener(v -> {
             playDanger();
             confirmDeleteAccount();
+        });
+
+        btnLogout.setOnClickListener(v -> {
+            playClick();
+            doLogout();
         });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -228,18 +210,7 @@ public class MenuActivity extends AppCompatActivity {
         });
 
         updateEventCountdownUI();
-    }
-
-    private void playClick() {
-        if (soundPool != null) {
-            soundPool.play(soundClick, 0.6f, 0.6f, 0, 0, 1f);
-        }
-    }
-
-    private void playDanger() {
-        if (soundPool != null) {
-            soundPool.play(soundDanger, 0.9f, 0.9f, 1, 0, 1f);
-        }
+        startEventCountdown();
     }
 
     private void openSettings() {
@@ -247,6 +218,13 @@ public class MenuActivity extends AppCompatActivity {
         settingsPanel.setVisibility(View.VISIBLE);
         btnBackFromSettings.setVisibility(View.VISIBLE);
         btnSettings.setVisibility(View.GONE);
+
+        btnLeaderboard.setVisibility(View.GONE);
+        btnAchievements.setVisibility(View.GONE);
+        btnEventUsers.setVisibility(View.GONE);
+        btnGroups.setVisibility(View.GONE);
+        if (tvEventCountdown != null) tvEventCountdown.setVisibility(View.GONE);
+
         loadProfile();
     }
 
@@ -255,6 +233,63 @@ public class MenuActivity extends AppCompatActivity {
         settingsPanel.setVisibility(View.GONE);
         btnBackFromSettings.setVisibility(View.GONE);
         btnSettings.setVisibility(View.VISIBLE);
+
+        btnLeaderboard.setVisibility(View.VISIBLE);
+        btnAchievements.setVisibility(View.VISIBLE);
+        btnEventUsers.setVisibility(View.VISIBLE);
+        btnGroups.setVisibility(View.VISIBLE);
+        if (tvEventCountdown != null) tvEventCountdown.setVisibility(View.VISIBLE);
+    }
+
+    private void showAvatarPickerDialog() {
+        int current = session.getAvatarResId(R.drawable.avatar_1);
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_avatar_picker, null);
+        RecyclerView rv = dialogView.findViewById(R.id.rvAvatars);
+        Button btnClose = dialogView.findViewById(R.id.btnCloseAvatarPicker);
+        TextView tvHint = dialogView.findViewById(R.id.tvAvatarHint);
+
+        rv.setLayoutManager(new GridLayoutManager(this, 3));
+        rv.setHasFixedSize(true);
+
+        java.util.List<AvatarItem> items = new java.util.ArrayList<>();
+        items.add(new AvatarItem(R.drawable.avatar_1, null, ""));
+        items.add(new AvatarItem(R.drawable.avatar_2, AchievementsManager.A_FIRST_STEPS, "Unlock: First Steps"));
+        items.add(new AvatarItem(R.drawable.avatar_3, AchievementsManager.A_OPEN_SHOP, "Unlock: Trader"));
+        items.add(new AvatarItem(R.drawable.avatar_4, AchievementsManager.A_OPEN_LEADERBOARD, "Unlock: Competitive"));
+        items.add(new AvatarItem(R.drawable.avatar_5, AchievementsManager.A_OPEN_EVENTS, "Unlock: Event Curious"));
+        items.add(new AvatarItem(R.drawable.avatar_6, AchievementsManager.A_OPEN_GROUPS, "Unlock: Social"));
+
+        java.util.Set<String> unlocked = achievements.getUnlockedIds();
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        AvatarAdapter adapter = new AvatarAdapter(items, unlocked, current, (item, isUnlocked) -> {
+            if (!isUnlocked) {
+                String msg = item.getLockedText();
+                if (msg == null || msg.isEmpty()) msg = "Locked";
+                tvHint.setText(msg);
+                tvHint.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            tvHint.setVisibility(View.GONE);
+            session.saveAvatarResId(item.getResId());
+            btnSettings.setImageResource(item.getResId());
+            dialog.dismiss();
+        });
+
+        rv.setAdapter(adapter);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
     }
 
     private void loadProfile() {
@@ -267,19 +302,18 @@ public class MenuActivity extends AppCompatActivity {
 
         if (token == null) return;
 
-        api.getProfile(token).enqueue(new retrofit2.Callback<com.example.android_proyecto.Models.User>() {
+        api.getProfile(token).enqueue(new Callback<User>() {
             @Override
-            public void onResponse(retrofit2.Call<com.example.android_proyecto.Models.User> call,
-                                   retrofit2.Response<com.example.android_proyecto.Models.User> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    var u = response.body();
+                    User u = response.body();
                     tvProfileEmail.setText("Email: " + u.getEmail());
                     tvProfileCoins.setText("Coins: " + u.getCoins());
                 }
             }
 
             @Override
-            public void onFailure(retrofit2.Call<com.example.android_proyecto.Models.User> call, Throwable t) {
+            public void onFailure(Call<User> call, Throwable t) {
                 tvProfileEmail.setText("Email: -");
                 tvProfileCoins.setText("Coins: -");
             }
@@ -355,66 +389,14 @@ public class MenuActivity extends AppCompatActivity {
         finish();
     }
 
-    private static class RotatingEvent {
-        final String id;
-        final String name;
-
-        RotatingEvent(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
-
-    private RotatingEvent getActiveEvent(long nowMs) {
-        long slot = nowMs / EVENT_ROTATION_MS;
-        boolean first = (slot % 2 == 0);
-        if (first) return new RotatingEvent("1", "Fishing Storm");
-        return new RotatingEvent("2", "Meteor Arrival");
-    }
-
-    private long getMillisUntilNextRotation(long nowMs) {
-        long inSlot = nowMs % EVENT_ROTATION_MS;
-        return EVENT_ROTATION_MS - inSlot;
-    }
-
-    private String formatMMSS(long ms) {
-        long totalSec = ms / 1000;
-        long min = totalSec / 60;
-        long sec = totalSec % 60;
-        return String.format("%02d:%02d", min, sec);
-    }
-
     private void updateEventCountdownUI() {
         long now = System.currentTimeMillis();
-        RotatingEvent ev = getActiveEvent(now);
-        long remaining = getMillisUntilNextRotation(now);
-
+        long remaining = EVENT_ROTATION_MS - (now % EVENT_ROTATION_MS);
+        long min = remaining / 60000;
+        long sec = (remaining / 1000) % 60;
         if (tvEventCountdown != null) {
-            tvEventCountdown.setText("Active: " + ev.name + "\nNext in: " + formatMMSS(remaining));
+            tvEventCountdown.setText("Active: Fishing Storm\nNext in: " + String.format("%02d:%02d", min, sec));
         }
-    }
-
-    private void showAvatarPickerDialog() {
-        int current = session.getAvatarResId(R.drawable.settings);
-
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_avatar_picker, null);
-        RecyclerView rv = dialogView.findViewById(R.id.rvAvatars);
-
-        rv.setLayoutManager(new GridLayoutManager(this, 3));
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setNegativeButton("Cancel", (d, w) -> d.dismiss())
-                .create();
-
-        AvatarAdapter adapter = new AvatarAdapter(avatarResIds, current, resId -> {
-            session.saveAvatarResId(resId);
-            btnSettings.setImageResource(resId);     // actualiza el icono del botón settings
-            dialog.dismiss();
-        });
-
-        rv.setAdapter(adapter);
-        dialog.show();
     }
 
     private void startEventCountdown() {
@@ -435,6 +417,14 @@ public class MenuActivity extends AppCompatActivity {
             eventHandler.removeCallbacks(eventRunnable);
             eventRunnable = null;
         }
+    }
+
+    private void playClick() {
+        if (soundPool != null) soundPool.play(soundClick, 0.6f, 0.6f, 0, 0, 1f);
+    }
+
+    private void playDanger() {
+        if (soundPool != null) soundPool.play(soundDanger, 0.9f, 0.9f, 1, 0, 1f);
     }
 
     @Override

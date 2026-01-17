@@ -1,5 +1,6 @@
 package com.example.android_proyecto.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -57,7 +58,6 @@ public class GroupsActivity extends AppCompatActivity {
         super.onResume();
         joinedGroupIds.clear();
         joinedGroupIds.addAll(session.getJoinedGroups());
-
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 
@@ -75,23 +75,15 @@ public class GroupsActivity extends AppCompatActivity {
                     adapter = new GroupsAdapter(
                             response.body(),
                             joinedGroupIds,
-                            new GroupsAdapter.OnJoinClickListener() {
+                            new GroupsAdapter.OnGroupActionListener() {
                                 @Override
-                                public void onJoin(Group group) {
-                                    if (joinedGroupIds.contains(group.getId())) {
-                                        Toast.makeText(GroupsActivity.this,
-                                                "You are already in this group",
-                                                Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        joinGroup(group.getId());
-                                    }
+                                public void onOpenMembers(Group group) {
+                                    openMembers(group.getId(), group.getName());
                                 }
 
                                 @Override
-                                public void onAlreadyJoined(Group group) {
-                                    Toast.makeText(GroupsActivity.this,
-                                            "You are already in this group",
-                                            Toast.LENGTH_SHORT).show();
+                                public void onJoin(Group group) {
+                                    joinGroup(group.getId());
                                 }
                             }
                     );
@@ -99,17 +91,22 @@ public class GroupsActivity extends AppCompatActivity {
                     recyclerGroups.setAdapter(adapter);
 
                 } else {
-                    Toast.makeText(GroupsActivity.this,
-                            "Could not load groups", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupsActivity.this, "Could not load groups", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Group>> call, Throwable t) {
-                Toast.makeText(GroupsActivity.this,
-                        "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupsActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void openMembers(int groupId, String groupName) {
+        Intent i = new Intent(this, GroupMembersActivity.class);
+        i.putExtra("groupId", groupId);
+        i.putExtra("groupName", groupName);
+        startActivity(i);
     }
 
     private void joinGroup(int groupId) {
@@ -121,28 +118,27 @@ public class GroupsActivity extends AppCompatActivity {
             return;
         }
 
+        int currentGroup = session.getCurrentGroupId();
+        if (currentGroup != -1 && currentGroup != groupId) {
+            Toast.makeText(this, "You are already in another group", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         api.joinGroup(token, groupId).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 if (response.code() == 200) {
+                    session.saveCurrentGroupId(groupId);
                     session.addJoinedGroup(groupId);
 
                     joinedGroupIds.add(groupId);
                     if (adapter != null) adapter.notifyDataSetChanged();
 
-                    Toast.makeText(GroupsActivity.this,
-                            "Joined group!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupsActivity.this, "Joined group!", Toast.LENGTH_SHORT).show();
 
                 } else if (response.code() == 409) {
-                    session.addJoinedGroup(groupId);
-                    joinedGroupIds.add(groupId);
-                    if (adapter != null) adapter.notifyDataSetChanged();
-
-                    Toast.makeText(GroupsActivity.this,
-                            "Ya estás en ese grupo",
-                            Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(GroupsActivity.this, "Already in a group", Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 401) {
                     Toast.makeText(GroupsActivity.this, "Unauthorized", Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 404) {
@@ -154,9 +150,7 @@ public class GroupsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(GroupsActivity.this,
-                        "Connection error: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupsActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

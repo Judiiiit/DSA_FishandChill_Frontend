@@ -43,6 +43,7 @@
         <activity android:name=".Activities.GroupsActivity" android:exported="false"  />
         <activity android:name=".Activities.LeaderboardActivity" />
         <activity android:name=".Activities.AchievementsActivity" />
+        <activity android:name=".Activities.GroupMembersActivity"/>
 
 
 

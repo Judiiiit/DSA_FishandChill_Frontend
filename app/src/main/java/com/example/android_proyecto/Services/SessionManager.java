@@ -2,6 +2,7 @@ package com.example.android_proyecto.Services;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -9,13 +10,10 @@ public class SessionManager {
 
     private static final String PREF_NAME = "session_prefs";
     private static final String KEY_TOKEN = "token";
-
     private static final String USER_NAME = "username";
-
     private static final String KEY_JOINED_GROUPS = "joined_groups";
-
     private static final String KEY_AVATAR_RES_PREFIX = "avatar_res_";
-
+    private static final String KEY_CURRENT_GROUP_PREFIX = "current_group_";
 
     private final SharedPreferences sp;
 
@@ -55,7 +53,6 @@ public class SessionManager {
         return result;
     }
 
-
     public void addJoinedGroup(int groupId) {
         String username = getUsername();
         if (username == null) return;
@@ -65,8 +62,25 @@ public class SessionManager {
         );
 
         stored.add(String.valueOf(groupId));
-
         sp.edit().putStringSet(KEY_JOINED_GROUPS + username, stored).apply();
+    }
+
+    public void saveCurrentGroupId(int groupId) {
+        String username = getUsername();
+        if (username == null) return;
+        sp.edit().putInt(KEY_CURRENT_GROUP_PREFIX + username, groupId).apply();
+    }
+
+    public int getCurrentGroupId() {
+        String username = getUsername();
+        if (username == null) return -1;
+        return sp.getInt(KEY_CURRENT_GROUP_PREFIX + username, -1);
+    }
+
+    public void clearCurrentGroup() {
+        String username = getUsername();
+        if (username == null) return;
+        sp.edit().remove(KEY_CURRENT_GROUP_PREFIX + username).apply();
     }
 
     public void saveAvatarResId(int resId) {
@@ -90,10 +104,10 @@ public class SessionManager {
         if (username != null) {
             editor.remove(KEY_AVATAR_RES_PREFIX + username);
             editor.remove(KEY_JOINED_GROUPS + username);
+            editor.remove(KEY_CURRENT_GROUP_PREFIX + username);
         }
 
         editor.remove(USER_NAME);
         editor.apply();
     }
-
 }

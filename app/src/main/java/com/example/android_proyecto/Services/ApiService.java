@@ -5,6 +5,7 @@ import com.example.android_proyecto.Models.EventUser;
 import com.example.android_proyecto.Models.Faq;
 import com.example.android_proyecto.Models.FishingRod;
 import com.example.android_proyecto.Models.Group;
+import com.example.android_proyecto.Models.GroupUser;
 import com.example.android_proyecto.Models.LeaderboardEntry;
 import com.example.android_proyecto.Models.QuestionRequest;
 import com.example.android_proyecto.Models.SellCapturedFish;
@@ -28,8 +29,6 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
-    // --- AUTH ---
-
     @POST("auth/register")
     Call<User> register(@Body UserRegister body);
 
@@ -38,8 +37,6 @@ public interface ApiService {
 
     @DELETE("auth/logout")
     Call<ResponseBody> logout(@Header("Authorization") String token);
-
-    // --- ME ---
 
     @GET("me")
     Call<User> getProfile(@Header("Authorization") String token);
@@ -53,8 +50,6 @@ public interface ApiService {
     @DELETE("me")
     Call<ResponseBody> deleteMe(@Header("Authorization") String token);
 
-    // --- CATALOG ---
-
     @GET("catalog/fishing_rods")
     Call<List<FishingRod>> getRods();
 
@@ -66,8 +61,6 @@ public interface ApiService {
 
     @GET("catalog/fishes/{species_name}")
     Call<ResponseBody> getFishByName(@Path("species_name") String speciesName);
-
-    // --- SHOP ---
 
     @POST("shop/captured_fishes/sell")
     Call<ResponseBody> sellCapturedFish(
@@ -87,12 +80,8 @@ public interface ApiService {
             @Path("fishing_rod_name") String rodName
     );
 
-    // --- GAME ---
-
     @POST("game/captured")
     Call<ResponseBody> captureFish(@Header("Authorization") String token);
-
-    // --- INFO ---
 
     @GET("info/faqs")
     Call<List<Faq>> getFaqs();
@@ -112,7 +101,12 @@ public interface ApiService {
             @Path("groupId") int groupId
     );
 
-    // --- EVENTS ---
+    @GET("info/groups/{groupId}/users")
+    Call<List<GroupUser>> getGroupUsers(
+            @Header("Authorization") String token,
+            @Path("groupId") int groupId
+    );
+
     @GET("events/{eventId}/users")
     Call<List<EventUser>> getEventUsers(@Path("eventId") String eventId);
 

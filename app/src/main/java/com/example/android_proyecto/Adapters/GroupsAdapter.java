@@ -18,16 +18,16 @@ import java.util.Set;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.VH> {
 
-    public interface OnJoinClickListener {
+    public interface OnGroupActionListener {
+        void onOpenMembers(Group group);
         void onJoin(Group group);
-        void onAlreadyJoined(Group group);
     }
 
     private final List<Group> groups;
     private final Set<Integer> joinedGroupIds;
-    private final OnJoinClickListener listener;
+    private final OnGroupActionListener listener;
 
-    public GroupsAdapter(List<Group> groups, Set<Integer> joinedGroupIds, OnJoinClickListener listener) {
+    public GroupsAdapter(List<Group> groups, Set<Integer> joinedGroupIds, OnGroupActionListener listener) {
         this.groups = groups;
         this.joinedGroupIds = joinedGroupIds;
         this.listener = listener;
@@ -63,7 +63,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.VH> {
         if (joined) {
             holder.btnJoinGroup.setText("Joined");
             holder.btnJoinGroup.setEnabled(false);
-            holder.layoutGroup.setAlpha(0.65f); // un poco más opaco
+            holder.layoutGroup.setAlpha(0.65f);
         } else {
             holder.btnJoinGroup.setText("Join");
             holder.btnJoinGroup.setEnabled(true);
@@ -75,12 +75,12 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.VH> {
         });
 
         holder.layoutGroup.setOnClickListener(v -> {
-            if (joined && listener != null) listener.onAlreadyJoined(g);
+            if (listener != null) listener.onOpenMembers(g);
         });
     }
 
     @Override
     public int getItemCount() {
-        return groups.size();
+        return groups != null ? groups.size() : 0;
     }
 }

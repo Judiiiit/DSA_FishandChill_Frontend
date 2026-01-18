@@ -34,25 +34,24 @@ public class EventUserAdapter extends RecyclerView.Adapter<EventUserAdapter.VH> 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         EventUser u = users.get(position);
-        holder.tvName.setText(u.getName());
-        holder.tvSurnames.setText(u.getSurnames());
+        holder.tvName.setText(u.getUsername());
+        holder.tvSurnames.setText("");
 
         Glide.with(holder.itemView.getContext())
-                .load(u.getAvatar())
-                .centerCrop()
+                .load(u.getAvatarUrl())
                 .into(holder.imgAvatar);
     }
 
     @Override
     public int getItemCount() {
-        return users != null ? users.size() : 0;
+        return users.size();
     }
 
     static class VH extends RecyclerView.ViewHolder {
         ImageView imgAvatar;
         TextView tvName, tvSurnames;
 
-        public VH(@NonNull View itemView) {
+        VH(@NonNull View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
             tvName = itemView.findViewById(R.id.tvName);

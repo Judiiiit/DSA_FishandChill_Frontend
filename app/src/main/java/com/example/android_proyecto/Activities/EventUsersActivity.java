@@ -15,9 +15,11 @@ import com.example.android_proyecto.Models.EventUser;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
+import com.example.android_proyecto.Services.SessionManager;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,11 +27,17 @@ import retrofit2.Response;
 public class EventUsersActivity extends AppCompatActivity {
 
     private RecyclerView recyclerUsers;
+    private Button btnJoinEvent;
+    private int eventId;
+    private String eventName;
+    private SessionManager session;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_users);
+
+        session = new SessionManager(this);
 
         Button btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -37,36 +45,70 @@ public class EventUsersActivity extends AppCompatActivity {
         recyclerUsers = findViewById(R.id.recyclerUsers);
         recyclerUsers.setLayoutManager(new LinearLayoutManager(this));
 
-        String eventId = getIntent().getStringExtra("eventId");
-        if (eventId == null) eventId = "1";
+        btnJoinEvent = findViewById(R.id.btnJoinEvent);
 
-        String eventName = getIntent().getStringExtra("eventName");
-        if (eventName == null) eventName = "Event " + eventId;
+        eventId = Integer.parseInt(getIntent().getStringExtra("eventId"));
+        eventName = getIntent().getStringExtra("eventName");
 
         TextView tvTitle = findViewById(R.id.tvTitle);
         tvTitle.setText("Registered users - " + eventName);
 
-        loadUsers(eventId);
+        btnJoinEvent.setOnClickListener(v -> subscribe());
+
+        loadUsers();
     }
 
-    private void loadUsers(String eventId) {
+    private void loadUsers() {
         ApiService api = RetrofitClient.getApiService();
+        String myUser = session.getUsername();
 
-        api.getEventUsers(eventId).enqueue(new Callback<List<EventUser>>() {
+        api.getRegisteredUsersInEvent(eventId).enqueue(new Callback<List<EventUser>>() {
             @Override
             public void onResponse(Call<List<EventUser>> call, Response<List<EventUser>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    recyclerUsers.setAdapter(new EventUserAdapter(response.body()));
-                } else {
-                    Toast.makeText(EventUsersActivity.this,
-                            "Could not load users", Toast.LENGTH_SHORT).show();
+                    List<EventUser> users = response.body();
+                    recyclerUsers.setAdapter(new EventUserAdapter(users));
+
+                    boolean joined = false;
+                    for (EventUser u : users) {
+                        if (u.getUsername().equals(myUser)) {
+                            joined = true;
+                            break;
+                        }
+                    }
+
+                    if (joined) {
+                        btnJoinEvent.setText("Joined");
+                        btnJoinEvent.setEnabled(false);
+                    } else {
+                        btnJoinEvent.setText("Join");
+                        btnJoinEvent.setEnabled(true);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<List<EventUser>> call, Throwable t) {
-                Toast.makeText(EventUsersActivity.this,
-                        "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(EventUsersActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void subscribe() {
+        String token = session.getToken();
+        ApiService api = RetrofitClient.getApiService();
+
+        api.subscribeToEvent(token, eventId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    loadUsers();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(EventUsersActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

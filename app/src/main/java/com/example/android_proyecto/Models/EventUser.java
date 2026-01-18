@@ -1,19 +1,14 @@
 package com.example.android_proyecto.Models;
 
 public class EventUser {
-    private String name;
-    private String surnames;
-    private String avatar;
+    private String username;
+    private String avatarUrl;
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public String getSurnames() {
-        return surnames;
-    }
-
-    public String getAvatar() {
-        return avatar;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 }

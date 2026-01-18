@@ -136,8 +136,16 @@ public interface ApiService {
     @GET("info/teams/{teamName}")
     Call<TeamResponse> getTeamInfo(@Path("teamName") String teamName);
 
-    @GET("events/{eventId}/users")
-    Call<List<EventUser>> getEventUsers(@Path("eventId") String eventId);
+    @POST("me/events/{eventId}/subscribe")
+    Call<ResponseBody> subscribeToEvent(
+            @Header("Authorization") String token,
+            @Path("eventId") int eventId
+    );
+
+    @GET("info/events/{eventId}")
+    Call<List<EventUser>> getRegisteredUsersInEvent(
+            @Path("eventId") int eventId
+    );
 
     @GET("info/leaderboard")
     Call<List<LeaderboardEntry>> getFishLeaderboard();
@@ -150,5 +158,4 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("teamName") String teamName
     );
-
 }

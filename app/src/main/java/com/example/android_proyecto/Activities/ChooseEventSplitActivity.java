@@ -27,11 +27,11 @@ public class ChooseEventSplitActivity extends AppCompatActivity {
     private Runnable runnable;
 
     private static class RotatingEvent {
-        final String id;
+        final int id;
         final String name;
         final int drawableRes;
 
-        RotatingEvent(String id, String name, int drawableRes) {
+        RotatingEvent(int id, String name, int drawableRes) {
             this.id = id;
             this.name = name;
             this.drawableRes = drawableRes;
@@ -55,7 +55,7 @@ public class ChooseEventSplitActivity extends AppCompatActivity {
         imgActive = findViewById(R.id.imgActive);
         tvEventInfo = findViewById(R.id.tvEventInfo);
 
-        activeEvent.setOnClickListener(v -> openActiveEvent());
+        activeEvent.setOnClickListener(v -> openEvent());
 
         updateUI();
     }
@@ -65,9 +65,9 @@ public class ChooseEventSplitActivity extends AppCompatActivity {
         boolean first = (slot % 2 == 0);
 
         if (first) {
-            return new RotatingEvent("1", "Fishing Storm", R.drawable.event_fishing_storm);
+            return new RotatingEvent(1, "Fishing Storm", R.drawable.event_fishing_storm);
         } else {
-            return new RotatingEvent("2", "Meteor Arrival", R.drawable.event_meteor_arrival);
+            return new RotatingEvent(2, "Meteor Arrival", R.drawable.event_meteor_arrival);
         }
     }
 
@@ -89,45 +89,32 @@ public class ChooseEventSplitActivity extends AppCompatActivity {
         long remaining = getMillisUntilNextRotation(now);
 
         imgActive.setImageResource(ev.drawableRes);
-        imgActive.setContentDescription(ev.name);
-
         tvEventInfo.setText("Active: " + ev.name + "\nNext in: " + formatMMSS(remaining));
     }
 
-    private void startTicker() {
-        if (runnable != null) return;
+    private void openEvent() {
+        RotatingEvent ev = getActiveEvent(System.currentTimeMillis());
+        Intent i = new Intent(this, EventUsersActivity.class);
+        i.putExtra("eventId", String.valueOf(ev.id));
+        i.putExtra("eventName", ev.name);
+        startActivity(i);
+    }
 
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                updateUI();
-                handler.postDelayed(this, 1000);
-            }
+    private void startTicker() {
+        runnable = () -> {
+            updateUI();
+            handler.postDelayed(runnable, 1000);
         };
         handler.post(runnable);
     }
 
     private void stopTicker() {
-        if (runnable != null) {
-            handler.removeCallbacks(runnable);
-            runnable = null;
-        }
-    }
-
-    private void openActiveEvent() {
-        long now = System.currentTimeMillis();
-        RotatingEvent ev = getActiveEvent(now);
-
-        Intent i = new Intent(this, EventUsersActivity.class);
-        i.putExtra("eventId", ev.id);
-        i.putExtra("eventName", ev.name);
-        startActivity(i);
+        handler.removeCallbacks(runnable);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        updateUI();
         startTicker();
     }
 

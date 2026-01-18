@@ -9,22 +9,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.android_proyecto.Adapters.MembersAdapter;
-import com.example.android_proyecto.Models.GroupUser;
+import com.example.android_proyecto.Adapters.TeamMembersAdapter;
+import com.example.android_proyecto.Models.TeamResponse;
 import com.example.android_proyecto.R;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
-import com.example.android_proyecto.Services.SessionManager;
 
-import java.util.List;
+import java.util.Collections;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
 public class GroupMembersActivity extends AppCompatActivity {
 
-    private SessionManager session;
     private ApiService api;
     private RecyclerView recyclerMembers;
 
@@ -33,14 +32,12 @@ public class GroupMembersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_members);
 
-        session = new SessionManager(this);
         api = RetrofitClient.getApiService();
 
-        int groupId = getIntent().getIntExtra("groupId", -1);
-        String groupName = getIntent().getStringExtra("groupName");
+        String teamName = getIntent().getStringExtra("teamName");
 
         TextView tvTitle = findViewById(R.id.tvGroupMembersTitle);
-        tvTitle.setText(groupName != null ? groupName : "Members");
+        tvTitle.setText(teamName != null ? teamName : "Members");
 
         Button btnBack = findViewById(R.id.btnBackMembers);
         btnBack.setOnClickListener(v -> finish());
@@ -48,30 +45,87 @@ public class GroupMembersActivity extends AppCompatActivity {
         recyclerMembers = findViewById(R.id.recyclerMembers);
         recyclerMembers.setLayoutManager(new LinearLayoutManager(this));
 
-        loadMembers(groupId);
-    }
-
-    private void loadMembers(int groupId) {
-        String token = session.getToken();
-        if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "No token", Toast.LENGTH_SHORT).show();
+        if (teamName == null || teamName.trim().isEmpty()) {
+            recyclerMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
+            Toast.makeText(this, "No team name", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        api.getGroupUsers(token, groupId).enqueue(new Callback<List<GroupUser>>() {
+        loadMembersPreferInfo(teamName);
+    }
+
+    private void loadMembersPreferInfo(String teamName) {
+        api.getTeamInfo(teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
             @Override
-            public void onResponse(Call<List<GroupUser>> call, Response<List<GroupUser>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    recyclerMembers.setAdapter(new MembersAdapter(response.body()));
+            public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
+                TeamResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.getMembers() != null) {
+                    recyclerMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
                 } else {
-                    Toast.makeText(GroupMembersActivity.this, "Could not load members (" + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    loadMembersFallbackTeams(teamName);
                 }
             }
 
             @Override
-            public void onFailure(Call<List<GroupUser>> call, Throwable t) {
-                Toast.makeText(GroupMembersActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<TeamResponse> call, Throwable t) {
+                loadMembersFallbackTeams(teamName);
             }
         });
     }
+
+    private void loadMembersFallbackTeams(String teamName) {
+        api.getTeam(teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
+            @Override
+            public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
+                TeamResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.getMembers() != null) {
+                    recyclerMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
+                } else {
+                    loadMembersFallbackMe(teamName);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TeamResponse> call, Throwable t) {
+                loadMembersFallbackMe(teamName);
+            }
+        });
+    }
+
+    private void loadMembersFallbackMe(String teamName) {
+        // Necesitas token aquí. Si no lo tienes en esta activity, usa SessionManager.
+        com.example.android_proyecto.Services.SessionManager session =
+                new com.example.android_proyecto.Services.SessionManager(this);
+
+        String token = session.getToken();
+        if (token == null || token.isEmpty()) {
+            recyclerMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
+            Toast.makeText(this, "No token", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        api.getTeamMembersMe(token, teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
+            @Override
+            public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
+                TeamResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.getMembers() != null) {
+                    recyclerMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
+                } else {
+                    recyclerMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
+                    Toast.makeText(GroupMembersActivity.this,
+                            "Could not load members (" + response.code() + ")",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TeamResponse> call, Throwable t) {
+                recyclerMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
+                Toast.makeText(GroupMembersActivity.this,
+                        "Connection error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

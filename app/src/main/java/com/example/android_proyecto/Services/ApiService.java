@@ -9,6 +9,8 @@ import com.example.android_proyecto.Models.GroupUser;
 import com.example.android_proyecto.Models.LeaderboardEntry;
 import com.example.android_proyecto.Models.QuestionRequest;
 import com.example.android_proyecto.Models.SellCapturedFish;
+import com.example.android_proyecto.Models.TeamRanking;
+import com.example.android_proyecto.Models.TeamResponse;
 import com.example.android_proyecto.Models.Token;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserLogIn;
@@ -107,6 +109,33 @@ public interface ApiService {
             @Path("groupId") int groupId
     );
 
+    @GET("teams")
+    Call<List<TeamRanking>> getTeams();
+
+    @GET("teams/{teamName}")
+    Call<TeamResponse> getTeam(@Path("teamName") String teamName);
+
+    @GET("me/teams/{teamName}/join")
+    Call<ResponseBody> joinTeam(
+            @Header("Authorization") String token,
+            @Path("teamName") String teamName
+    );
+
+    @POST("me/teams/{teamName}/create")
+    Call<ResponseBody> createTeam(
+            @Header("Authorization") String token,
+            @Path("teamName") String teamName
+    );
+
+    @GET("me/teams/leave")
+    Call<ResponseBody> leaveTeam(@Header("Authorization") String token);
+
+    @GET("info/teams/ranking")
+    Call<List<TeamRanking>> getTeamsRankingInfo();
+
+    @GET("info/teams/{teamName}")
+    Call<TeamResponse> getTeamInfo(@Path("teamName") String teamName);
+
     @GET("events/{eventId}/users")
     Call<List<EventUser>> getEventUsers(@Path("eventId") String eventId);
 
@@ -115,5 +144,11 @@ public interface ApiService {
 
     @GET("me/change_avatar")
     Call<ResponseBody> changeAvatar(@Header("Authorization") String token);
+
+    @GET("me/teams/{teamName}/members")
+    Call<TeamResponse> getTeamMembersMe(
+            @Header("Authorization") String token,
+            @Path("teamName") String teamName
+    );
 
 }

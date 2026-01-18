@@ -6,6 +6,7 @@ public class User {
     private int coins;
     private String equippedFishingRod;
     private String avatarUrl;
+    private String teamName;
 
 
     public String getUsername() {
@@ -19,5 +20,7 @@ public class User {
         return equippedFishingRod; }
 
     public String getAvatarUrl() { return avatarUrl; }
+
+    public String getTeamName() { return teamName; }
 
 }

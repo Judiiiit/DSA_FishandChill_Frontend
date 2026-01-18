@@ -13,6 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Android_Proyecto">
+        <activity android:name=".Activities.GroupsActivity" android:exported="false"  />
+        <activity android:name=".Activities.GroupMembersActivity"/>
 
         <activity
             android:name=".Activities.SplashActivity"

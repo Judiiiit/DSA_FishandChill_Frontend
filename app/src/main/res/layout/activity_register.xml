@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondologin"
-    android:backgroundTintMode="src_in">
-
+    android:background="@drawable/fondologin">
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -15,6 +13,7 @@
         android:background="@drawable/bg_login_card"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.35"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -83,26 +82,13 @@
                 android:padding="6dp"
                 android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tvPasswordRequirements"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/pixel_font"
-                android:textColor="@android:color/white"
-                android:textSize="9sp"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:alpha="0.9"
-                android:text="Requisitos:" />
-
             <ProgressBar
                 android:id="@+id/progressRegister"
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="6dp"
                 android:visibility="gone" />
 
             <Button
@@ -128,6 +114,95 @@
         </LinearLayout>
 
     </FrameLayout>
+
+    <!-- Requirements panel on the right -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/requirementsPanel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_login_card"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/frameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/frameLayout">
+
+        <TextView
+            android:id="@+id/tvReqTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pixel_font"
+            android:text="Requirements"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReqTitle">
+
+            <TextView
+                android:id="@+id/tvReqLen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="@font/pixel_font"
+                android:text="❌ At least 6 characters"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvReqLetter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="@font/pixel_font"
+                android:text="❌ Contains a letter"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvReqNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="@font/pixel_font"
+                android:text="❌ Contains a number"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvReqSpecial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="@font/pixel_font"
+                android:text="❌ Contains a symbol"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvReqMatch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pixel_font"
+                android:text="❌ Passwords match"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/btnBack"

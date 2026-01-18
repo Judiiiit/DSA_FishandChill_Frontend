@@ -2,6 +2,7 @@ package com.example.android_proyecto.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,13 +12,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.Models.User;
 import com.example.android_proyecto.Models.UserRegister;
 import com.example.android_proyecto.R;
-import com.example.android_proyecto.MainActivity;
 import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.ApiService;
-import com.example.android_proyecto.Services.SessionManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,12 +26,14 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
 
     private ApiService api;
+
     private EditText etUser, etPass, etPassConfirm, etEmail;
     private ProgressBar progress;
     private TextView tvMsg;
     private Button btnRegister, btnBack;
 
-    private SessionManager session;
+    // Requirements panel
+    private TextView tvReqLen, tvReqLetter, tvReqNumber, tvReqSpecial, tvReqMatch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,64 +41,65 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         etUser = findViewById(R.id.etUserReg);
+        etEmail = findViewById(R.id.etEmailReg);
         etPass = findViewById(R.id.etPassReg);
         etPassConfirm = findViewById(R.id.etPassConfirmReg);
-        etEmail = findViewById(R.id.etEmailReg);
-        btnRegister = findViewById(R.id.btnRegister);
+
         progress = findViewById(R.id.progressRegister);
         tvMsg = findViewById(R.id.tvMsgRegister);
-        api = RetrofitClient.getApiService();
+
+        btnRegister = findViewById(R.id.btnRegister);
         btnBack = findViewById(R.id.btnBack);
 
-        EditText etPasswordReg = findViewById(R.id.etPassReg);
-        TextView tvPasswordRequirements = findViewById(R.id.tvPasswordRequirements);
+        // Requirements TextViews
+        tvReqLen = findViewById(R.id.tvReqLen);
+        tvReqLetter = findViewById(R.id.tvReqLetter);
+        tvReqNumber = findViewById(R.id.tvReqNumber);
+        tvReqSpecial = findViewById(R.id.tvReqSpecial);
+        tvReqMatch = findViewById(R.id.tvReqMatch);
 
-        updatePasswordRequirements(tvPasswordRequirements, "");
+        api = RetrofitClient.getApiService();
 
-        etPasswordReg.addTextChangedListener(new android.text.TextWatcher() {
+        // Live update of requirements
+        android.text.TextWatcher watcher = new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(android.text.Editable s) {
-                updatePasswordRequirements(tvPasswordRequirements, s.toString());
+            @Override public void afterTextChanged(android.text.Editable s) {
+                updateRequirementsPanel();
             }
-        });
+        };
 
-
-        session = new SessionManager(this);
+        etPass.addTextChangedListener(watcher);
+        etPassConfirm.addTextChangedListener(watcher);
+        updateRequirementsPanel();
 
         btnRegister.setOnClickListener(v -> doRegister());
 
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
             finish();
         });
     }
 
     private void showLoading(boolean show) {
         progress.setVisibility(show ? View.VISIBLE : View.GONE);
+        btnRegister.setEnabled(!show);
+        btnBack.setEnabled(!show);
     }
 
     private void doRegister() {
         String username = etUser.getText().toString().trim();
-        String password = etPass.getText().toString().trim();
-        String password2 = etPassConfirm.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
+        String password = etPass.getText().toString();
+        String password2 = etPassConfirm.getText().toString();
 
-        if (username.isEmpty() || password.isEmpty() || password2.isEmpty() || email.isEmpty()) {
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || password2.isEmpty()) {
             tvMsg.setText("Please fill in all fields");
             return;
         }
 
-        if (!email.contains("@")) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             tvMsg.setText("Invalid email format");
-            return;
-        }
-
-        if (password.length() < 6) {
-            tvMsg.setText("Password must be at least 6 characters");
             return;
         }
 
@@ -121,9 +124,6 @@ public class RegisterActivity extends AppCompatActivity {
                 showLoading(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    User u = response.body();
-
-
                     Toast.makeText(RegisterActivity.this,
                             "Register completed", Toast.LENGTH_LONG).show();
 
@@ -145,76 +145,25 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private String getPasswordValidationError(String password) {
-        if (password == null) return "La contraseña es obligatoria";
-
-        if (password.length() < 6) {
-            return "La contraseña debe tener al menos 6 caracteres";
-        }
-        // Al menos 1 letra (incluye acentos/ñ, etc.)
-        if (!password.matches(".*\\p{L}.*")) {
-            return "La contraseña debe contener al menos 1 letra";
-        }
-        // Al menos 1 número
-        if (!password.matches(".*\\p{N}.*")) {
-            return "La contraseña debe contener al menos 1 numero";
-        }
-        // Al menos 1 carácter especial (no cuenta espacios)
-        if (!password.matches(".*[^\\p{L}\\p{N}\\s].*")) {
-            return "La contraseña debe contener al menos 1 caracter especial";
-        }
-
+        if (password.length() < 6) return "Password must be at least 6 characters";
+        if (!password.matches(".*\\p{L}.*")) return "Password must contain at least one letter";
+        if (!password.matches(".*\\p{N}.*")) return "Password must contain at least one number";
+        if (!password.matches(".*[^\\p{L}\\p{N}\\s].*")) return "Password must contain at least one symbol";
         return null;
     }
 
-    private void updatePasswordRequirements(TextView tv, String password) {
-        boolean okLen = password != null && password.length() >= 6;
-        boolean okLetter = password != null && password.matches(".*\\p{L}.*");
-        boolean okNumber = password != null && password.matches(".*\\p{N}.*");
-        boolean okSpecial = password != null && password.matches(".*[^\\p{L}\\p{N}\\s].*");
+    private void updateRequirementsPanel() {
+        String password = etPass.getText().toString();
+        String confirm = etPassConfirm.getText().toString();
 
-        int green = androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_green_light);
-        int red = androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_light);
-
-        // Texto compacto en 1 línea (cambia colores por segmento)
-        String prefix = "Requisitos: ";
-        String sLen = "6+";
-        String sep1 = " | ";
-        String sLetter = "letra";
-        String sep2 = " | ";
-        String sNumber = "numero";
-        String sep3 = " | ";
-        String sSpecial = "especial";
-
-        String full = prefix + sLen + sep1 + sLetter + sep2 + sNumber + sep3 + sSpecial;
-
-        android.text.SpannableString span = new android.text.SpannableString(full);
-
-        int startLen = prefix.length();
-        int endLen = startLen + sLen.length();
-
-        int startLetter = endLen + sep1.length();
-        int endLetter = startLetter + sLetter.length();
-
-        int startNumber = endLetter + sep2.length();
-        int endNumber = startNumber + sNumber.length();
-
-        int startSpecial = endNumber + sep3.length();
-        int endSpecial = startSpecial + sSpecial.length();
-
-        span.setSpan(new android.text.style.ForegroundColorSpan(okLen ? green : red),
-                startLen, endLen, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        span.setSpan(new android.text.style.ForegroundColorSpan(okLetter ? green : red),
-                startLetter, endLetter, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        span.setSpan(new android.text.style.ForegroundColorSpan(okNumber ? green : red),
-                startNumber, endNumber, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        span.setSpan(new android.text.style.ForegroundColorSpan(okSpecial ? green : red),
-                startSpecial, endSpecial, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        tv.setText(span);
+        setReq(tvReqLen, password.length() >= 6, "At least 6 characters");
+        setReq(tvReqLetter, password.matches(".*\\p{L}.*"), "Contains a letter");
+        setReq(tvReqNumber, password.matches(".*\\p{N}.*"), "Contains a number");
+        setReq(tvReqSpecial, password.matches(".*[^\\p{L}\\p{N}\\s].*"), "Contains a symbol");
+        setReq(tvReqMatch, !password.isEmpty() && password.equals(confirm), "Passwords match");
     }
 
-
+    private void setReq(TextView tv, boolean ok, String label) {
+        tv.setText((ok ? "✅ " : "❌ ") + label);
+    }
 }

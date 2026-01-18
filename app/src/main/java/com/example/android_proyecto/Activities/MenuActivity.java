@@ -70,9 +70,10 @@ public class MenuActivity extends AppCompatActivity {
     private final Handler eventHandler = new Handler(Looper.getMainLooper());
     private Runnable eventRunnable;
 
-    private ImageView ivSettingsAvatar;
-
+    private ImageView ivSettingsAvatarBig;
     private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L;
+
+    private boolean isSettingsOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +120,10 @@ public class MenuActivity extends AppCompatActivity {
         tvProfilePassword = findViewById(R.id.tvProfilePassword);
         tvEventCountdown = findViewById(R.id.tvEventCountdown);
 
-        ivSettingsAvatar = findViewById(R.id.ivSettingsAvatar);
-        ivSettingsAvatar.setImageResource(R.drawable.avatar_1);
+        ivSettingsAvatarBig = findViewById(R.id.ivSettingsAvatarBig);
+        ivSettingsAvatarBig.setImageResource(R.drawable.avatar_1);
+
+        setSettingsOpen(false);   // fuerza el estado correcto al inicio
 
         btnSettings.setImageResource(R.drawable.avatar_1);
 
@@ -233,32 +236,44 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void openSettings() {
-        findViewById(R.id.frameLayout2).setVisibility(View.GONE);
-        settingsPanel.setVisibility(View.VISIBLE);
-        btnBackFromSettings.setVisibility(View.VISIBLE);
-        btnSettings.setVisibility(View.GONE);
-
-        btnLeaderboard.setVisibility(View.GONE);
-        btnAchievements.setVisibility(View.GONE);
-        btnEventUsers.setVisibility(View.GONE);
-        btnGroups.setVisibility(View.GONE);
-        if (tvEventCountdown != null) tvEventCountdown.setVisibility(View.GONE);
-
+        playClick();
+        setSettingsOpen(true);
         loadProfile();
     }
 
     private void closeSettings() {
-        findViewById(R.id.frameLayout2).setVisibility(View.VISIBLE);
-        settingsPanel.setVisibility(View.GONE);
-        btnBackFromSettings.setVisibility(View.GONE);
-        btnSettings.setVisibility(View.VISIBLE);
-
-        btnLeaderboard.setVisibility(View.VISIBLE);
-        btnAchievements.setVisibility(View.VISIBLE);
-        btnEventUsers.setVisibility(View.VISIBLE);
-        btnGroups.setVisibility(View.VISIBLE);
-        if (tvEventCountdown != null) tvEventCountdown.setVisibility(View.VISIBLE);
+        playClick();
+        setSettingsOpen(false);
     }
+
+    private void setSettingsOpen(boolean open) {
+        isSettingsOpen = open;
+
+        settingsPanel.setVisibility(open ? View.VISIBLE : View.GONE);
+        findViewById(R.id.frameLayout2).setVisibility(open ? View.GONE : View.VISIBLE);
+
+        btnSettings.setVisibility(open ? View.GONE : View.VISIBLE);
+        btnBackFromSettings.setVisibility(open ? View.VISIBLE : View.GONE);
+
+        if (ivSettingsAvatarBig != null) ivSettingsAvatarBig.setVisibility(open ? View.VISIBLE : View.GONE);
+
+        btnLeaderboard.setVisibility(open ? View.GONE : View.VISIBLE);
+        btnAchievements.setVisibility(open ? View.GONE : View.VISIBLE);
+        btnEventUsers.setVisibility(open ? View.GONE : View.VISIBLE);
+        btnGroups.setVisibility(open ? View.GONE : View.VISIBLE);
+        if (tvEventCountdown != null) tvEventCountdown.setVisibility(open ? View.GONE : View.VISIBLE);
+
+        if (!open) {
+            String url = session != null ? session.getAvatarUrl() : null;
+            if (url != null && !url.trim().isEmpty()) {
+                refreshAvatars(url);
+            } else {
+                btnSettings.setVisibility(View.VISIBLE);
+                btnSettings.setImageResource(R.drawable.avatar_1);
+            }
+        }
+    }
+
 
     private void showAvatarPickerDialog() {
         int current = session.getAvatarResId(R.drawable.avatar_1);
@@ -499,23 +514,32 @@ public class MenuActivity extends AppCompatActivity {
 
                     String url = raw.trim();
 
+                    // Por si viene como "https://...."
                     if (url.startsWith("\"") && url.endsWith("\"") && url.length() >= 2) {
                         url = url.substring(1, url.length() - 1);
                     }
 
                     session.saveAvatarUrl(url);
+
+                    // Limpia imágenes anteriores (Glide)
+                    if (!isSettingsOpen) {
+                        Glide.with(MenuActivity.this).clear(btnSettings);
+                    }
+                    if (ivSettingsAvatarBig != null) {
+                        Glide.with(MenuActivity.this).clear(ivSettingsAvatarBig);
+                    }
+
+                    // Placeholder mientras carga (si quieres)
+                    if (!isSettingsOpen) {
+                        btnSettings.setImageResource(R.drawable.avatar_1);
+                    }
+                    if (ivSettingsAvatarBig != null) {
+                        ivSettingsAvatarBig.setImageResource(R.drawable.avatar_1);
+                    }
+
+                    // Carga el nuevo avatar en los sitios permitidos
                     refreshAvatars(url);
 
-                    Glide.with(MenuActivity.this).clear(btnSettings);
-                    if (ivSettingsAvatar != null) Glide.with(MenuActivity.this).clear(ivSettingsAvatar);
-
-                    btnSettings.setImageResource(R.drawable.avatar_1);
-                    if (ivSettingsAvatar != null) ivSettingsAvatar.setImageResource(R.drawable.avatar_1);
-
-                    refreshAvatars(url);
-
-
-                    refreshAvatars(url);
                 } catch (Exception ignored) {}
             }
 
@@ -526,11 +550,15 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void refreshAvatars(String url) {
-        hideAvatar(btnSettings);
-        hideAvatar(ivSettingsAvatar);
+        if (!isSettingsOpen) {
+            btnSettings.setVisibility(View.VISIBLE);
+            loadAvatarInto(btnSettings, url);
+        }
 
-        loadAvatarInto(btnSettings, url);
-        if (ivSettingsAvatar != null) loadAvatarInto(ivSettingsAvatar, url);
+        if (isSettingsOpen && ivSettingsAvatarBig != null) {
+            ivSettingsAvatarBig.setVisibility(View.VISIBLE);
+            loadAvatarInto(ivSettingsAvatarBig, url);
+        }
     }
 
 

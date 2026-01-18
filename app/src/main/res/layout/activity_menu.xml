@@ -178,14 +178,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
-                    android:id="@+id/ivSettingsAvatar"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:layout_marginEnd="10dp"
-                    android:contentDescription="User avatar"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/avatar_1" />
 
                 <TextView
                     android:id="@+id/tvSettingsTitle"
@@ -303,6 +295,21 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/ivSettingsAvatarBig"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:contentDescription="User avatar large"
+        android:scaleType="centerCrop"
+        android:src="@drawable/avatar_1"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/settingsPanel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/settingsPanel"
+        app:layout_constraintBottom_toBottomOf="@id/settingsPanel"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.10" />
 
     <Button
         android:id="@+id/btnBackFromSettings"

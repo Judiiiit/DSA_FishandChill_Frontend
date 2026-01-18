@@ -20,6 +20,7 @@ public class AskQuestionActivity extends AppCompatActivity {
 
     private EditText etTitle, etMessage, etSender;
     private Button btnSend;
+    private Button btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +31,9 @@ public class AskQuestionActivity extends AppCompatActivity {
         etMessage = findViewById(R.id.etMessage);
         etSender = findViewById(R.id.etSender);
         btnSend = findViewById(R.id.btnSend);
+        btnBack = findViewById(R.id.btnBack);
 
+        btnBack.setOnClickListener(v -> finish());
         btnSend.setOnClickListener(v -> sendQuestion());
     }
 
@@ -44,7 +47,6 @@ public class AskQuestionActivity extends AppCompatActivity {
             return;
         }
 
-        // date = null -> el backend la rellena si no viene
         QuestionRequest req = new QuestionRequest(null, title, message, sender);
 
         ApiService api = RetrofitClient.getApiService();

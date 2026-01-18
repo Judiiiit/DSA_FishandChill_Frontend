@@ -76,12 +76,12 @@ public class LeaderboardActivity extends AppCompatActivity {
     private void loadLeaderboard() {
         progressLeaderboard.setVisibility(View.VISIBLE);
 
-        api.getFishLeaderboard(50).enqueue(new Callback<List<LeaderboardEntry>>() {
+        api.getFishLeaderboard().enqueue(new Callback<List<LeaderboardEntry>>() {
             @Override
             public void onResponse(Call<List<LeaderboardEntry>> call, Response<List<LeaderboardEntry>> response) {
                 progressLeaderboard.setVisibility(View.GONE);
 
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful()) {
                     bindLeaderboard(response.body());
                 } else {
                     Toast.makeText(LeaderboardActivity.this, "Failed: " + response.code(), Toast.LENGTH_SHORT).show();

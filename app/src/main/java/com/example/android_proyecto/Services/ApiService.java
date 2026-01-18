@@ -139,8 +139,8 @@ public interface ApiService {
     @GET("events/{eventId}/users")
     Call<List<EventUser>> getEventUsers(@Path("eventId") String eventId);
 
-    @GET("leaderboard/fishes")
-    Call<List<LeaderboardEntry>> getFishLeaderboard(@Query("limit") int limit);
+    @GET("info/leaderboard")
+    Call<List<LeaderboardEntry>> getFishLeaderboard();
 
     @GET("me/change_avatar")
     Call<ResponseBody> changeAvatar(@Header("Authorization") String token);

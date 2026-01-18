@@ -5,6 +5,7 @@ public class User {
     private String email;
     private int coins;
     private String equippedFishingRod;
+    private String avatarUrl;
 
 
     public String getUsername() {
@@ -16,5 +17,7 @@ public class User {
 
     public String getEquippedFishingRod() {
         return equippedFishingRod; }
+
+    public String getAvatarUrl() { return avatarUrl; }
 
 }

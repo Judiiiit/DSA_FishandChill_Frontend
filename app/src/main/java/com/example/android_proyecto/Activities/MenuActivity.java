@@ -40,6 +40,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.bumptech.glide.Glide;
+import android.graphics.drawable.PictureDrawable;
+import com.example.android_proyecto.glide.SvgSoftwareLayerSetter;
+
+import android.widget.ImageView;
+
+
 public class MenuActivity extends AppCompatActivity {
 
     private Button btnGoGame, btnGoShop, btnLogout;
@@ -62,6 +69,8 @@ public class MenuActivity extends AppCompatActivity {
 
     private final Handler eventHandler = new Handler(Looper.getMainLooper());
     private Runnable eventRunnable;
+
+    private ImageView ivSettingsAvatar;
 
     private static final long EVENT_ROTATION_MS = 10 * 60 * 1000L;
 
@@ -110,14 +119,24 @@ public class MenuActivity extends AppCompatActivity {
         tvProfilePassword = findViewById(R.id.tvProfilePassword);
         tvEventCountdown = findViewById(R.id.tvEventCountdown);
 
-        int currentAvatar = session.getAvatarResId(R.drawable.avatar_1);
-        btnSettings.setImageResource(currentAvatar);
+        ivSettingsAvatar = findViewById(R.id.ivSettingsAvatar);
+        ivSettingsAvatar.setImageResource(R.drawable.avatar_1);
+
+        btnSettings.setImageResource(R.drawable.avatar_1);
+
+        String cachedAvatarUrl = session.getAvatarUrl();
+        if (cachedAvatarUrl != null && !cachedAvatarUrl.isEmpty()) {
+            loadAvatarIntoSettingsButton(cachedAvatarUrl);
+        }
+
+        loadProfile();
+
 
         tvWelcomeUser.setText("Welcome, " + session.getUsername() + "!");
 
         btnChooseAvatar.setOnClickListener(v -> {
             playClick();
-            showAvatarPickerDialog();
+            changeAvatarOnServer();
         });
 
         unityLauncher = registerForActivityResult(
@@ -305,10 +324,20 @@ public class MenuActivity extends AppCompatActivity {
         api.getProfile(token).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    User u = response.body();
-                    tvProfileEmail.setText("Email: " + u.getEmail());
-                    tvProfileCoins.setText("Coins: " + u.getCoins());
+                if (!response.isSuccessful() || response.body() == null) {
+                    tvProfileEmail.setText("Email: -");
+                    tvProfileCoins.setText("Coins: -");
+                    return;
+                }
+
+                User u = response.body();
+                tvProfileEmail.setText("Email: " + u.getEmail());
+                tvProfileCoins.setText("Coins: " + u.getCoins());
+
+                String avatarUrl = u.getAvatarUrl();
+                if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                    session.saveAvatarUrl(avatarUrl);
+                    refreshAvatars(avatarUrl);
                 }
             }
 
@@ -426,6 +455,175 @@ public class MenuActivity extends AppCompatActivity {
     private void playDanger() {
         if (soundPool != null) soundPool.play(soundDanger, 0.9f, 0.9f, 1, 0, 1f);
     }
+
+    private void loadAvatarIntoSettingsButton(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            btnSettings.setImageResource(R.drawable.avatar_1);
+            return;
+        }
+
+        String u = url.trim().toLowerCase();
+
+        if (u.contains("/svg") || u.contains("svg?") || u.endsWith(".svg")) {
+            Glide.with(this)
+                    .as(PictureDrawable.class)
+                    .load(url)
+                    .placeholder(R.drawable.avatar_1)
+                    .error(R.drawable.avatar_1)
+                    .listener(new SvgSoftwareLayerSetter())
+                    .into(btnSettings);
+            return;
+        }
+
+        Glide.with(this)
+                .load(url)
+                .placeholder(R.drawable.avatar_1)
+                .error(R.drawable.avatar_1)
+                .circleCrop()
+                .into(btnSettings);
+    }
+
+
+    private void changeAvatarOnServer() {
+        String token = session.getToken();
+        if (token == null) return;
+
+        api.changeAvatar(token).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful() || response.body() == null) return;
+
+                try {
+                    String raw = response.body().string();
+                    if (raw == null) return;
+
+                    String url = raw.trim();
+
+                    if (url.startsWith("\"") && url.endsWith("\"") && url.length() >= 2) {
+                        url = url.substring(1, url.length() - 1);
+                    }
+
+                    session.saveAvatarUrl(url);
+                    refreshAvatars(url);
+
+                    Glide.with(MenuActivity.this).clear(btnSettings);
+                    if (ivSettingsAvatar != null) Glide.with(MenuActivity.this).clear(ivSettingsAvatar);
+
+                    btnSettings.setImageResource(R.drawable.avatar_1);
+                    if (ivSettingsAvatar != null) ivSettingsAvatar.setImageResource(R.drawable.avatar_1);
+
+                    refreshAvatars(url);
+
+
+                    refreshAvatars(url);
+                } catch (Exception ignored) {}
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            }
+        });
+    }
+
+    private void refreshAvatars(String url) {
+        hideAvatar(btnSettings);
+        hideAvatar(ivSettingsAvatar);
+
+        loadAvatarInto(btnSettings, url);
+        if (ivSettingsAvatar != null) loadAvatarInto(ivSettingsAvatar, url);
+    }
+
+
+    private void loadAvatarInto(ImageView target, String url) {
+        if (target == null) return;
+
+        if (url == null || url.trim().isEmpty()) {
+            // si no hay url, puedes decidir si mostrar default o dejar invisible
+            target.setImageDrawable(null);
+            target.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        String u = url.trim().toLowerCase();
+
+        if (u.contains("/svg") || u.contains("svg?") || u.endsWith(".svg")) {
+            Glide.with(MenuActivity.this)
+                    .as(PictureDrawable.class)
+                    .load(url)
+                    .error(R.drawable.avatar_1)
+                    .listener(new SvgSoftwareLayerSetter())
+                    .listener(new com.bumptech.glide.request.RequestListener<PictureDrawable>() {
+                        @Override
+                        public boolean onLoadFailed(
+                                com.bumptech.glide.load.engine.GlideException e,
+                                Object model,
+                                com.bumptech.glide.request.target.Target<PictureDrawable> targetGlide,
+                                boolean isFirstResource
+                        ) {
+                            showAvatar(target);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(
+                                PictureDrawable resource,
+                                Object model,
+                                com.bumptech.glide.request.target.Target<PictureDrawable> targetGlide,
+                                com.bumptech.glide.load.DataSource dataSource,
+                                boolean isFirstResource
+                        ) {
+                            showAvatar(target);
+                            return false;
+                        }
+                    })
+                    .into(target);
+            return;
+        }
+
+        Glide.with(MenuActivity.this)
+                .load(url)
+                .error(R.drawable.avatar_1) // opcional
+                .circleCrop()
+                .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(
+                            com.bumptech.glide.load.engine.GlideException e,
+                            Object model,
+                            com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> targetGlide,
+                            boolean isFirstResource
+                    ) {
+                        showAvatar(target);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(
+                            android.graphics.drawable.Drawable resource,
+                            Object model,
+                            com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> targetGlide,
+                            com.bumptech.glide.load.DataSource dataSource,
+                            boolean isFirstResource
+                    ) {
+                        showAvatar(target);
+                        return false;
+                    }
+                })
+                .into(target);
+    }
+
+
+    private void hideAvatar(ImageView v) {
+        if (v == null) return;
+        Glide.with(MenuActivity.this).clear(v);
+        v.setImageDrawable(null);
+        v.setVisibility(View.INVISIBLE);
+    }
+
+    private void showAvatar(ImageView v) {
+        if (v == null) return;
+        v.setVisibility(View.VISIBLE);
+    }
+
 
     @Override
     protected void onStart() {

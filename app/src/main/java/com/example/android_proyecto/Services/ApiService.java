@@ -112,4 +112,8 @@ public interface ApiService {
 
     @GET("leaderboard/fishes")
     Call<List<LeaderboardEntry>> getFishLeaderboard(@Query("limit") int limit);
+
+    @GET("me/change_avatar")
+    Call<ResponseBody> changeAvatar(@Header("Authorization") String token);
+
 }

@@ -55,5 +55,6 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     // Librería especializada para YouTube en listas
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    implementation("com.caverock:androidsvg:1.4")
 
 }

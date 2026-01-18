@@ -163,36 +163,52 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.664">
 
-        <!-- ✅ NUEVA ESTRUCTURA: título arriba, info centro, botones abajo -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tvSettingsTitle"
+            <LinearLayout
+                android:id="@+id/settingsTitleRow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:fontFamily="@font/pixel_font"
-                android:text="Settings"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- INFO (centrada entre título y botones) -->
+                <ImageView
+                    android:id="@+id/ivSettingsAvatar"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="User avatar"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/avatar_1" />
+
+                <TextView
+                    android:id="@+id/tvSettingsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/pixel_font"
+                    android:text="Settings"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Info del usuario -->
             <LinearLayout
                 android:id="@+id/settingsInfo"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:orientation="vertical"
                 android:gravity="center_horizontal"
-                app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toTopOf="@id/settingsButtons"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settingsTitleRow"
                 app:layout_constraintVertical_bias="0.0">
 
                 <TextView
@@ -248,16 +264,16 @@
 
             </LinearLayout>
 
-            <!-- BOTONES ANCLADOS ABAJO -->
+            <!-- Botones -->
             <LinearLayout
                 android:id="@+id/settingsButtons"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:gravity="center_horizontal"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <Button
                     android:id="@+id/btnChooseAvatar"
@@ -266,7 +282,7 @@
                     android:layout_marginTop="6dp"
                     android:background="@drawable/pixel_button_bg"
                     android:fontFamily="@font/pixel_font"
-                    android:text="Choose avatar"
+                    android:text="Change avatar"
                     android:textAllCaps="false"
                     android:textSize="10sp"
                     app:backgroundTint="@null" />

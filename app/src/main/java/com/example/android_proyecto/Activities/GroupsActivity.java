@@ -2,11 +2,13 @@ package com.example.android_proyecto.Activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.PictureDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.android_proyecto.Adapters.TeamMembersAdapter;
 import com.example.android_proyecto.Adapters.TeamsAdapter;
 import com.example.android_proyecto.Models.TeamRanking;
@@ -25,6 +28,7 @@ import com.example.android_proyecto.RetrofitClient;
 import com.example.android_proyecto.Services.AchievementsManager;
 import com.example.android_proyecto.Services.ApiService;
 import com.example.android_proyecto.Services.SessionManager;
+import com.example.android_proyecto.glide.SvgSoftwareLayerSetter;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -35,7 +39,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class GroupsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerTeams;
@@ -44,6 +47,8 @@ public class GroupsActivity extends AppCompatActivity {
     private View sectionMyTeam;
     private Button btnLeaveTeam;
     private Button btnCreateTeam;
+
+    private ImageView ivMyTeamAvatar;
 
     private SessionManager session;
     private ApiService api;
@@ -70,6 +75,8 @@ public class GroupsActivity extends AppCompatActivity {
         sectionMyTeam = findViewById(R.id.sectionMyTeam);
         btnLeaveTeam = findViewById(R.id.btnLeaveTeam);
         btnCreateTeam = findViewById(R.id.btnCreateTeam);
+
+        ivMyTeamAvatar = findViewById(R.id.ivMyTeamAvatar);
 
         Button btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -131,12 +138,15 @@ public class GroupsActivity extends AppCompatActivity {
         if (!hasTeam()) {
             tvMyTeamName.setText("No team");
             btnLeaveTeam.setVisibility(View.GONE);
+            if (ivMyTeamAvatar != null) ivMyTeamAvatar.setVisibility(View.GONE);
             recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
             return;
         }
 
         tvMyTeamName.setText(currentTeamName);
         btnLeaveTeam.setVisibility(View.VISIBLE);
+
+        showTeamAvatarFromCache(ivMyTeamAvatar, currentTeamName);
 
         loadTeamMembersPreferInfo(currentTeamName);
     }
@@ -182,7 +192,6 @@ public class GroupsActivity extends AppCompatActivity {
                     return;
                 }
 
-                // IMPORTANT: show real error (code + body)
                 String body = readBodySafe(response.errorBody());
                 Toast.makeText(GroupsActivity.this,
                         "Create failed (" + response.code() + "): " + body,
@@ -200,7 +209,6 @@ public class GroupsActivity extends AppCompatActivity {
         api.getTeamsRankingInfo().enqueue(new retrofit2.Callback<List<TeamRanking>>() {
             @Override
             public void onResponse(Call<List<TeamRanking>> call, Response<List<TeamRanking>> response) {
-                // Si el body viene null aunque sea 200, hacemos fallback
                 if (response.isSuccessful() && response.body() != null) {
                     bindTeams(response.body());
                 } else {
@@ -214,7 +222,6 @@ public class GroupsActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void loadTeamsRankingFallback() {
         api.getTeams().enqueue(new Callback<List<TeamRanking>>() {
@@ -238,6 +245,17 @@ public class GroupsActivity extends AppCompatActivity {
     }
 
     private void bindTeams(List<TeamRanking> teams) {
+        if (teams != null) {
+            for (TeamRanking t : teams) {
+                if (t == null) continue;
+                session.saveTeamAvatarUrl(t.getName(), t.getAvatar());
+            }
+        }
+
+        if (hasTeam()) {
+            showTeamAvatarFromCache(ivMyTeamAvatar, currentTeamName);
+        }
+
         TeamsAdapter adapter = new TeamsAdapter(
                 teams,
                 currentTeamName,
@@ -251,17 +269,16 @@ public class GroupsActivity extends AppCompatActivity {
                     public void onJoin(TeamRanking team) {
                         joinTeam(team.getName());
                     }
-                }
+                },
+                session
         );
         recyclerTeams.setAdapter(adapter);
     }
-
 
     private void loadTeamMembersPreferInfo(String teamName) {
         api.getTeamInfo(teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
             @Override
             public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
-                // Si /info devuelve algo no parseable o members=null, hacemos fallback
                 TeamResponse body = response.body();
                 if (response.isSuccessful() && body != null && body.getMembers() != null) {
                     recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
@@ -277,37 +294,61 @@ public class GroupsActivity extends AppCompatActivity {
         });
     }
 
-
-    private void loadTeamMembersFallback(String teamName) {
-        api.getTeam(teamName).enqueue(new Callback<TeamResponse>() {
+    private void loadTeamMembersFallbackTeams(String teamName) {
+        api.getTeam(teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
             @Override
             public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getMembers() != null) {
-                    recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(response.body().getMembers()));
+                TeamResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.getMembers() != null) {
+                    recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
+                } else {
+                    loadTeamMembersFallbackMe(teamName);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TeamResponse> call, Throwable t) {
+                loadTeamMembersFallbackMe(teamName);
+            }
+        });
+    }
+
+    private void loadTeamMembersFallbackMe(String teamName) {
+        String token = session.getToken();
+        if (token == null || token.isEmpty()) {
+            recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
+            return;
+        }
+
+        api.getTeamMembersMe(token, teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
+            @Override
+            public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
+                TeamResponse body = response.body();
+                if (response.isSuccessful() && body != null && body.getMembers() != null) {
+                    recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
                 } else {
                     recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
-                    String body = readBodySafe(response.errorBody());
                     Toast.makeText(GroupsActivity.this,
-                            "Could not load members (" + response.code() + "): " + body,
-                            Toast.LENGTH_LONG).show();
+                            "Could not load members (" + response.code() + ")",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<TeamResponse> call, Throwable t) {
                 recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
-                Toast.makeText(GroupsActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupsActivity.this,
+                        "Connection error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 
     private void openMembers(String teamName) {
         Intent i = new Intent(this, GroupMembersActivity.class);
         i.putExtra("teamName", teamName);
         startActivity(i);
     }
-
 
     private void joinTeam(String teamName) {
         String token = session.getToken();
@@ -383,54 +424,35 @@ public class GroupsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadTeamMembersFallbackTeams(String teamName) {
-        api.getTeam(teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
-            @Override
-            public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
-                TeamResponse body = response.body();
-                if (response.isSuccessful() && body != null && body.getMembers() != null) {
-                    recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
-                } else {
-                    loadTeamMembersFallbackMe(teamName);
-                }
-            }
+    private void showTeamAvatarFromCache(ImageView target, String teamName) {
+        if (target == null) return;
 
-            @Override
-            public void onFailure(Call<TeamResponse> call, Throwable t) {
-                loadTeamMembersFallbackMe(teamName);
-            }
-        });
-    }
-
-    private void loadTeamMembersFallbackMe(String teamName) {
-        String token = session.getToken();
-        if (token == null || token.isEmpty()) {
-            recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
+        String url = session.getTeamAvatarUrl(teamName);
+        if (url == null || url.trim().isEmpty()) {
+            target.setVisibility(View.GONE);
             return;
         }
 
-        api.getTeamMembersMe(token, teamName).enqueue(new retrofit2.Callback<TeamResponse>() {
-            @Override
-            public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
-                TeamResponse body = response.body();
-                if (response.isSuccessful() && body != null && body.getMembers() != null) {
-                    recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(body.getMembers()));
-                } else {
-                    recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
-                    Toast.makeText(GroupsActivity.this,
-                            "Could not load members (" + response.code() + ")",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
+        target.setVisibility(View.VISIBLE);
+        Glide.with(this).clear(target);
+        target.setImageDrawable(null);
 
-            @Override
-            public void onFailure(Call<TeamResponse> call, Throwable t) {
-                recyclerMyTeamMembers.setAdapter(new TeamMembersAdapter(Collections.emptyList()));
-                Toast.makeText(GroupsActivity.this,
-                        "Connection error: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        String u = url.trim().toLowerCase();
+        if (u.contains("/svg") || u.contains("svg?") || u.endsWith(".svg")) {
+            Glide.with(this)
+                    .as(PictureDrawable.class)
+                    .load(url)
+                    .placeholder(R.drawable.avatar_1)
+                    .error(R.drawable.avatar_1)
+                    .listener(new SvgSoftwareLayerSetter())
+                    .into(target);
+        } else {
+            Glide.with(this)
+                    .load(url)
+                    .placeholder(R.drawable.avatar_1)
+                    .error(R.drawable.avatar_1)
+                    .centerCrop()
+                    .into(target);
+        }
     }
-
 }

@@ -16,7 +16,7 @@ public class SessionManager {
     private static final String KEY_CURRENT_GROUP_PREFIX = "current_group_";
     private static final String KEY_AVATAR_URL_PREFIX = "avatar_url_";
     private static final String KEY_TEAM_NAME_PREFIX = "team_name_";
-
+    private static final String KEY_TEAM_AVATAR_PREFIX = "team_avatar_";
 
     private final SharedPreferences sp;
 
@@ -128,6 +128,24 @@ public class SessionManager {
         sp.edit().remove(KEY_TEAM_NAME_PREFIX + username).apply();
     }
 
+    public void saveTeamAvatarUrl(String teamName, String url) {
+        String username = getUsername();
+        if (username == null) return;
+        if (teamName == null || teamName.trim().isEmpty()) return;
+        if (url == null || url.trim().isEmpty()) return;
+
+        String key = KEY_TEAM_AVATAR_PREFIX + username + "_" + teamName.trim().toLowerCase();
+        sp.edit().putString(key, url).apply();
+    }
+
+    public String getTeamAvatarUrl(String teamName) {
+        String username = getUsername();
+        if (username == null) return null;
+        if (teamName == null || teamName.trim().isEmpty()) return null;
+
+        String key = KEY_TEAM_AVATAR_PREFIX + username + "_" + teamName.trim().toLowerCase();
+        return sp.getString(key, null);
+    }
 
     public void clear() {
         String username = getUsername();

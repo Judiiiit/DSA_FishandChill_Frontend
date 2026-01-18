@@ -1,17 +1,22 @@
 package com.example.android_proyecto.Adapters;
 
+import android.graphics.drawable.PictureDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.android_proyecto.Models.TeamRanking;
 import com.example.android_proyecto.R;
+import com.example.android_proyecto.Services.SessionManager;
+import com.example.android_proyecto.glide.SvgSoftwareLayerSetter;
 
 import java.util.List;
 
@@ -25,23 +30,27 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.VH> {
     private final List<TeamRanking> teams;
     private final String currentTeamName;
     private final OnTeamActionListener listener;
+    private final SessionManager session; // ✅ para cachear avatar
 
-    public TeamsAdapter(List<TeamRanking> teams, String currentTeamName, OnTeamActionListener listener) {
+    public TeamsAdapter(List<TeamRanking> teams, String currentTeamName, OnTeamActionListener listener, SessionManager session) {
         this.teams = teams;
         this.currentTeamName = currentTeamName;
         this.listener = listener;
+        this.session = session;
     }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvGroupName;
         Button btnJoinGroup;
         LinearLayout layoutGroup;
+        ImageView imgTeamAvatar;
 
         VH(@NonNull View itemView) {
             super(itemView);
             tvGroupName = itemView.findViewById(R.id.tvGroupName);
             btnJoinGroup = itemView.findViewById(R.id.btnJoinGroup);
             layoutGroup = itemView.findViewById(R.id.layoutGroup);
+            imgTeamAvatar = itemView.findViewById(R.id.imgTeamAvatar);
         }
     }
 
@@ -85,6 +94,39 @@ public class TeamsAdapter extends RecyclerView.Adapter<TeamsAdapter.VH> {
         holder.layoutGroup.setOnClickListener(v -> {
             if (listener != null) listener.onOpenMembers(t);
         });
+
+        String teamName = t.getName();
+        String url = t.getAvatar();
+
+        if (session != null && teamName != null && url != null && !url.trim().isEmpty()) {
+            session.saveTeamAvatarUrl(teamName, url);
+        }
+
+        Glide.with(holder.itemView.getContext()).clear(holder.imgTeamAvatar);
+        holder.imgTeamAvatar.setImageDrawable(null);
+
+        if (url == null || url.trim().isEmpty()) {
+            holder.imgTeamAvatar.setImageResource(R.drawable.avatar_1);
+            return;
+        }
+
+        String u = url.trim().toLowerCase();
+        if (u.contains("/svg") || u.contains("svg?") || u.endsWith(".svg")) {
+            Glide.with(holder.itemView.getContext())
+                    .as(PictureDrawable.class)
+                    .load(url)
+                    .placeholder(R.drawable.avatar_1)
+                    .error(R.drawable.avatar_1)
+                    .listener(new SvgSoftwareLayerSetter())
+                    .into(holder.imgTeamAvatar);
+        } else {
+            Glide.with(holder.itemView.getContext())
+                    .load(url)
+                    .placeholder(R.drawable.avatar_1)
+                    .error(R.drawable.avatar_1)
+                    .centerCrop()
+                    .into(holder.imgTeamAvatar);
+        }
     }
 
     @Override

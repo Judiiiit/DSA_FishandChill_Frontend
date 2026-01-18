@@ -51,7 +51,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- MY TEAM -->
             <LinearLayout
                 android:id="@+id/sectionMyTeam"
                 android:layout_width="match_parent"
@@ -75,6 +74,15 @@
                     android:layout_marginTop="8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/ivMyTeamAvatar"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_marginEnd="10dp"
+                        android:contentDescription="My team avatar"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/tvMyTeamName"
@@ -111,7 +119,6 @@
 
             </LinearLayout>
 
-            <!-- ALL TEAMS HEADER + CREATE -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

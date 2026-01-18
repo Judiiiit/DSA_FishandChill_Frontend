@@ -28,6 +28,14 @@
             android:textStyle="bold"
             android:textSize="18sp" />
 
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="Avatar"
+            android:scaleType="centerCrop"
+            />
+
         <TextView
             android:id="@+id/tvUsername"
             android:layout_width="0dp"

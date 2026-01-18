@@ -5,6 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ImageView;
+import com.bumptech.glide.Glide;
+
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +46,15 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         holder.tvUsername.setText(e.getUsername());
         holder.tvTotal.setText(String.valueOf(e.getTotalFishes()));
 
+        String avatarUrl = e.getAvatarUrl();
+        Glide.with(holder.itemView.getContext())
+                .load(avatarUrl)
+                .placeholder(R.drawable.avatar_1)
+                .error(R.drawable.avatar_1)
+                .circleCrop()
+                .into(holder.imgAvatar);
+
+
         // Desde #4 todo normal
         holder.containerRow.setBackgroundResource(R.drawable.bg_leaderboard_normal);
     }
@@ -54,6 +66,8 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvRank, tvUsername, tvTotal;
+        ImageView imgAvatar;
+
         LinearLayout containerRow;
 
         VH(@NonNull View itemView) {
@@ -61,6 +75,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
             tvRank = itemView.findViewById(R.id.tvRank);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvTotal = itemView.findViewById(R.id.tvTotal);
+            imgAvatar = itemView.findViewById(R.id.imgAvatar);
             containerRow = itemView.findViewById(R.id.containerRow);
         }
     }

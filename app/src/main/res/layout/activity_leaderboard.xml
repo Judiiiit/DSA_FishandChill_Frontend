@@ -94,6 +94,14 @@
                 android:textColor="#FFD54F"
                 android:textStyle="bold"
                 android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/imgTop2Avatar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar_2" />
         </LinearLayout>
 
         <!-- #1 -->
@@ -141,6 +149,14 @@
                 android:textColor="#FFD54F"
                 android:textStyle="bold"
                 android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/imgTop1Avatar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar_1" />
         </LinearLayout>
 
         <!-- #3 -->
@@ -187,6 +203,14 @@
                 android:textColor="#FFD54F"
                 android:textStyle="bold"
                 android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/imgTop3Avatar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar_3" />
         </LinearLayout>
 
     </LinearLayout>
